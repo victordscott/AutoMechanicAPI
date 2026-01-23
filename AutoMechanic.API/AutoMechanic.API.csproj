@@ -9,6 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="FFmpeg\ffmpeg.exe" />
+    <None Remove="FFmpeg\MediaInfo.dll" />
+    <None Remove="FFmpeg\MediaInfo.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="FFmpeg\ffmpeg.exe" />
+    <Content Include="FFmpeg\MediaInfo.dll" />
+    <Content Include="FFmpeg\MediaInfo.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21" />
