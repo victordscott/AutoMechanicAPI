@@ -15,6 +15,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
     public virtual DbSet<Appointment> Appointments { get; set; }
 
+    public virtual DbSet<AppointmentFile> AppointmentFiles { get; set; }
+
     public virtual DbSet<AppointmentLog> AppointmentLogs { get; set; }
 
     public virtual DbSet<AppointmentNote> AppointmentNotes { get; set; }
@@ -41,15 +43,29 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
     public virtual DbSet<ConsultantInfo> ConsultantInfos { get; set; }
 
+    public virtual DbSet<FileType> FileTypes { get; set; }
+
+    public virtual DbSet<FileUpload> FileUploads { get; set; }
+
     public virtual DbSet<Log> Logs { get; set; }
 
     public virtual DbSet<Rating> Ratings { get; set; }
+
+    public virtual DbSet<ServiceLength> ServiceLengths { get; set; }
 
     public virtual DbSet<TimeZone> TimeZones { get; set; }
 
     public virtual DbSet<UserDetail> UserDetails { get; set; }
 
+    public virtual DbSet<UserFile> UserFiles { get; set; }
+
     public virtual DbSet<UserLogin> UserLogins { get; set; }
+
+    public virtual DbSet<Vehicle> Vehicles { get; set; }
+
+    public virtual DbSet<VehicleFile> VehicleFiles { get; set; }
+
+    public virtual DbSet<VehicleMileage> VehicleMileages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -87,6 +103,7 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .HasColumnName("date_updated");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.LengthMinutes).HasColumnName("length_minutes");
+            entity.Property(e => e.ServiceLengthId).HasColumnName("service_length_id");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
 
             entity.HasOne(d => d.AppointmentStatus).WithMany(p => p.Appointments)
@@ -107,6 +124,42 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.HasOne(d => d.CustomerRating).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.CustomerRatingId)
                 .HasConstraintName("fk_appt_cust_rating");
+
+            entity.HasOne(d => d.ServiceLength).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.ServiceLengthId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_appt_service_length");
+        });
+
+        modelBuilder.Entity<AppointmentFile>(entity =>
+        {
+            entity.HasKey(e => e.AppointmentFileId).HasName("appointment_file_pkey");
+
+            entity.ToTable("appointment_file");
+
+            entity.Property(e => e.AppointmentFileId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("appointment_file_id");
+            entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
+            entity.Property(e => e.ConsultantNote).HasColumnName("consultant_note");
+            entity.Property(e => e.CustomerNote).HasColumnName("customer_note");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.DateUpdated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_updated");
+            entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+
+            entity.HasOne(d => d.Appointment).WithMany(p => p.AppointmentFiles)
+                .HasForeignKey(d => d.AppointmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_appt_file_upload_appt");
+
+            entity.HasOne(d => d.FileUpload).WithMany(p => p.AppointmentFiles)
+                .HasForeignKey(d => d.FileUploadId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_appt_file_upload_file");
         });
 
         modelBuilder.Entity<AppointmentLog>(entity =>
@@ -120,6 +173,10 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .HasColumnName("appointment_log_id");
             entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
             entity.Property(e => e.AppointmentStatusId).HasColumnName("appointment_status_id");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
             entity.Property(e => e.LogDate)
                 .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
                 .HasColumnName("log_date");
@@ -327,6 +384,7 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.ConsultantAvailabilitySchedules)
                 .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("consultant_availability_schedule_user_id_fkey");
         });
 
@@ -340,6 +398,16 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("user_id");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.PrimaryImageUploadId).HasColumnName("primary_image_upload_id");
+            entity.Property(e => e.PrimaryVideoUploadId).HasColumnName("primary_video_upload_id");
+
+            entity.HasOne(d => d.PrimaryImageUpload).WithMany(p => p.ConsultantDetailPrimaryImageUploads)
+                .HasForeignKey(d => d.PrimaryImageUploadId)
+                .HasConstraintName("fk_consultant_detail_image_file");
+
+            entity.HasOne(d => d.PrimaryVideoUpload).WithMany(p => p.ConsultantDetailPrimaryVideoUploads)
+                .HasForeignKey(d => d.PrimaryVideoUploadId)
+                .HasConstraintName("fk_consultant_detail_video_file");
 
             entity.HasOne(d => d.User).WithOne(p => p.ConsultantDetail)
                 .HasForeignKey<ConsultantDetail>(d => d.UserId)
@@ -355,6 +423,14 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
             entity.Property(e => e.ConsultantDescription).HasColumnName("consultant_description");
             entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.PrimaryImageFileName).HasColumnName("primary_image_file_name");
+            entity.Property(e => e.PrimaryImageFileNote).HasColumnName("primary_image_file_note");
+            entity.Property(e => e.PrimaryImageFileTypeId).HasColumnName("primary_image_file_type_id");
+            entity.Property(e => e.PrimaryImageUploadId).HasColumnName("primary_image_upload_id");
+            entity.Property(e => e.PrimaryVideoFileName).HasColumnName("primary_video_file_name");
+            entity.Property(e => e.PrimaryVideoFileNote).HasColumnName("primary_video_file_note");
+            entity.Property(e => e.PrimaryVideoFileTypeId).HasColumnName("primary_video_file_type_id");
+            entity.Property(e => e.PrimaryVideoUploadId).HasColumnName("primary_video_upload_id");
             entity.Property(e => e.RoleName).HasMaxLength(256);
             entity.Property(e => e.TimeZoneAbbreviation)
                 .HasMaxLength(10)
@@ -363,6 +439,60 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("time_zone_name");
             entity.Property(e => e.UserName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<FileType>(entity =>
+        {
+            entity.HasKey(e => e.FileTypeId).HasName("file_type_pkey");
+
+            entity.ToTable("file_type");
+
+            entity.Property(e => e.FileTypeId)
+                .ValueGeneratedNever()
+                .HasColumnName("file_type_id");
+            entity.Property(e => e.FileTypeName)
+                .HasMaxLength(100)
+                .HasColumnName("file_type_name");
+        });
+
+        modelBuilder.Entity<FileUpload>(entity =>
+        {
+            entity.HasKey(e => e.FileUploadId).HasName("file_upload_pkey");
+
+            entity.ToTable("file_upload");
+
+            entity.Property(e => e.FileUploadId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("file_upload_id");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.DateUpdated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_updated");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
+            entity.Property(e => e.FileName).HasColumnName("file_name");
+            entity.Property(e => e.FileNote).HasColumnName("file_note");
+            entity.Property(e => e.FileSizeBytes).HasColumnName("file_size_bytes");
+            entity.Property(e => e.FileTypeId).HasColumnName("file_type_id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.IsPublic)
+                .HasDefaultValue(false)
+                .HasColumnName("is_public");
+            entity.Property(e => e.UploadedById).HasColumnName("uploaded_by_id");
+            entity.Property(e => e.VideoLengthSec).HasColumnName("video_length_sec");
+
+            entity.HasOne(d => d.FileType).WithMany(p => p.FileUploads)
+                .HasForeignKey(d => d.FileTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_file_upload_type");
+
+            entity.HasOne(d => d.UploadedBy).WithMany(p => p.FileUploads)
+                .HasForeignKey(d => d.UploadedById)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_file_upload_user");
         });
 
         modelBuilder.Entity<Log>(entity =>
@@ -393,6 +523,23 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("rating_id");
             entity.Property(e => e.RatingName).HasColumnName("rating_name");
+        });
+
+        modelBuilder.Entity<ServiceLength>(entity =>
+        {
+            entity.HasKey(e => e.ServiceLengthId).HasName("service_length_pkey");
+
+            entity.ToTable("service_length");
+
+            entity.Property(e => e.ServiceLengthId)
+                .ValueGeneratedNever()
+                .HasColumnName("service_length_id");
+            entity.Property(e => e.LengthMinutes).HasColumnName("length_minutes");
+            entity.Property(e => e.ServiceLengthCost)
+                .HasPrecision(6, 2)
+                .HasColumnName("service_length_cost");
+            entity.Property(e => e.ServiceLengthDesc).HasColumnName("service_length_desc");
+            entity.Property(e => e.ServiceLengthName).HasColumnName("service_length_name");
         });
 
         modelBuilder.Entity<TimeZone>(entity =>
@@ -443,6 +590,37 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.UserName).HasMaxLength(256);
         });
 
+        modelBuilder.Entity<UserFile>(entity =>
+        {
+            entity.HasKey(e => e.UserFileId).HasName("user_file_pkey");
+
+            entity.ToTable("user_file");
+
+            entity.Property(e => e.UserFileId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("user_file_id");
+            entity.Property(e => e.ConsultantNote).HasColumnName("consultant_note");
+            entity.Property(e => e.CustomerNote).HasColumnName("customer_note");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.DateUpdated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_updated");
+            entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.FileUpload).WithMany(p => p.UserFiles)
+                .HasForeignKey(d => d.FileUploadId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_file_upload_file");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserFiles)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_file_upload_user");
+        });
+
         modelBuilder.Entity<UserLogin>(entity =>
         {
             entity.HasKey(e => e.UserLoginId).HasName("user_login_pkey");
@@ -463,6 +641,97 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_user_login_user");
+        });
+
+        modelBuilder.Entity<Vehicle>(entity =>
+        {
+            entity.HasKey(e => e.VehicleId).HasName("vehicle_pkey");
+
+            entity.ToTable("vehicle");
+
+            entity.Property(e => e.VehicleId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("vehicle_id");
+            entity.Property(e => e.ConsultantNote).HasColumnName("consultant_note");
+            entity.Property(e => e.CurrentMileage).HasColumnName("current_mileage");
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.CustomerNote).HasColumnName("customer_note");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.DateUpdated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_updated");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
+            entity.Property(e => e.ExternalMakeId).HasColumnName("external_make_id");
+            entity.Property(e => e.ExternalModelId).HasColumnName("external_model_id");
+            entity.Property(e => e.ExternalSubmodelId).HasColumnName("external_submodel_id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.VehicleMake).HasColumnName("vehicle_make");
+            entity.Property(e => e.VehicleModel).HasColumnName("vehicle_model");
+            entity.Property(e => e.VehicleSubmodel).HasColumnName("vehicle_submodel");
+            entity.Property(e => e.VehicleVin).HasColumnName("vehicle_vin");
+            entity.Property(e => e.VehicleYear).HasColumnName("vehicle_year");
+            entity.Property(e => e.VinLookupResult).HasColumnName("vin_lookup_result");
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.Vehicles)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_customer_vehicle_user");
+        });
+
+        modelBuilder.Entity<VehicleFile>(entity =>
+        {
+            entity.HasKey(e => e.VehicleFileId).HasName("vehicle_file_pkey");
+
+            entity.ToTable("vehicle_file");
+
+            entity.Property(e => e.VehicleFileId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("vehicle_file_id");
+            entity.Property(e => e.ConsultantNote).HasColumnName("consultant_note");
+            entity.Property(e => e.CustomerNote).HasColumnName("customer_note");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.DateUpdated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_updated");
+            entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+            entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+
+            entity.HasOne(d => d.FileUpload).WithMany(p => p.VehicleFiles)
+                .HasForeignKey(d => d.FileUploadId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_vehicle_file_upload_file");
+
+            entity.HasOne(d => d.Vehicle).WithMany(p => p.VehicleFiles)
+                .HasForeignKey(d => d.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_vehicle_file_upload_vehicle");
+        });
+
+        modelBuilder.Entity<VehicleMileage>(entity =>
+        {
+            entity.HasKey(e => e.VehicleMileageId).HasName("vehicle_mileage_pkey");
+
+            entity.ToTable("vehicle_mileage");
+
+            entity.Property(e => e.VehicleMileageId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("vehicle_mileage_id");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("date_created");
+            entity.Property(e => e.MileageId).HasColumnName("mileage_id");
+            entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+
+            entity.HasOne(d => d.Vehicle).WithMany(p => p.VehicleMileages)
+                .HasForeignKey(d => d.VehicleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_vehicle_mileage_vehicle");
         });
 
         OnModelCreatingPartial(modelBuilder);
