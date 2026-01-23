@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35806.103
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.API", "AutoMechanic.API\AutoMechanic.API.csproj", "{2054149E-D7AF-4770-AEB7-AB94051017BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.Common", "AutoMechanic.Common\AutoMechanic.Common.csproj", "{9ECAFEF6-1712-495A-B58E-0371D16DF814}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.Configuration", "AutoMechanic.Configuration\AutoMechanic.Configuration.csproj", "{B775F586-FE95-4BD3-A58A-1DF96A0B4FD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.DataAccess", "AutoMechanic.DataAccess\AutoMechanic.DataAccess.csproj", "{3F4B1E94-ED41-4237-B1C4-90591CCDBE04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.Auth", "AutoMechanic.Auth\AutoMechanic.Auth.csproj", "{E5C53C54-263A-4716-8860-5970B87F63C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMechanic.Services", "AutoMechanic.Services\AutoMechanic.Services.csproj", "{098523BF-9BF6-47C8-B7D8-B92EE1564874}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2054149E-D7AF-4770-AEB7-AB94051017BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2054149E-D7AF-4770-AEB7-AB94051017BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2054149E-D7AF-4770-AEB7-AB94051017BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2054149E-D7AF-4770-AEB7-AB94051017BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ECAFEF6-1712-495A-B58E-0371D16DF814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ECAFEF6-1712-495A-B58E-0371D16DF814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ECAFEF6-1712-495A-B58E-0371D16DF814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ECAFEF6-1712-495A-B58E-0371D16DF814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B775F586-FE95-4BD3-A58A-1DF96A0B4FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B775F586-FE95-4BD3-A58A-1DF96A0B4FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B775F586-FE95-4BD3-A58A-1DF96A0B4FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B775F586-FE95-4BD3-A58A-1DF96A0B4FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F4B1E94-ED41-4237-B1C4-90591CCDBE04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F4B1E94-ED41-4237-B1C4-90591CCDBE04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F4B1E94-ED41-4237-B1C4-90591CCDBE04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F4B1E94-ED41-4237-B1C4-90591CCDBE04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5C53C54-263A-4716-8860-5970B87F63C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5C53C54-263A-4716-8860-5970B87F63C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5C53C54-263A-4716-8860-5970B87F63C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5C53C54-263A-4716-8860-5970B87F63C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{098523BF-9BF6-47C8-B7D8-B92EE1564874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{098523BF-9BF6-47C8-B7D8-B92EE1564874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{098523BF-9BF6-47C8-B7D8-B92EE1564874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{098523BF-9BF6-47C8-B7D8-B92EE1564874}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F539118E-6D54-4877-AABA-F108C2F690DB}
+	EndGlobalSection
+EndGlobal
