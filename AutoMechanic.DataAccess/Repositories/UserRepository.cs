@@ -29,6 +29,57 @@ namespace AutoMechanic.DataAccess.Repositories
             }
         }
 
+        public async Task<UserDetail?> GetUserByUserEmailAsync(string emailAddress)
+        {
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                return await dbContext.UserDetails.Where(u => u.NormalizedEmail == emailAddress.ToUpper()).FirstOrDefaultAsync();
+            }
+        }
+
+        public async Task<bool> InsertUserLoginOTPCodeAsync(Guid userId, string otpCode, int optCodeExpireMinutes)
+        {
+            var createDate = DateTime.UtcNow;
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                await dbContext.UserLoginOtpCodes.AddAsync(
+                    new UserLoginOtpCode
+                    {
+                        UserId = userId,
+                        OtpCode = otpCode,
+                        OtpCodeCreateDate = createDate,
+                        OtpCodeExpireDate = createDate.AddMinutes(optCodeExpireMinutes),
+                        OtpCodeUsed = false
+                    }
+                );
+            }
+            return true;
+        }
+
+        public async Task<bool> VerifyUserLoginOTPCodeAsync(Guid userId, string otpCode)
+        {
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                var userLoginOtpCode = await dbContext.UserLoginOtpCodes.Where(u => u.UserId == userId 
+                    && u.OtpCode == otpCode 
+                    && u.OtpCodeUsed == false
+                    && u.OtpCodeExpireDate < DateTime.UtcNow
+                    ).FirstOrDefaultAsync();
+
+                if (userLoginOtpCode is not null)
+                {
+                    userLoginOtpCode.OtpCodeUsed = true;
+                    dbContext.UserLoginOtpCodes.Update(userLoginOtpCode);
+                    await dbContext.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public async Task SaveUserRefreshTokenAsync(Guid userId, string refreshToken, DateTime expiryTime)
         {
             //var userLogins = await dbContext.UserLogins.ToListAsync();

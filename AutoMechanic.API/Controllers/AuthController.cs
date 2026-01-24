@@ -2,6 +2,7 @@
 using AutoMechanic.Auth.Models;
 using AutoMechanic.Auth.Services;
 using AutoMechanic.Auth.Services.Interfaces;
+using AutoMechanic.Common.Enums;
 using AutoMechanic.DataAccess.DirectAccess;
 using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Models;
@@ -34,6 +35,27 @@ namespace AutoMechanic.API.Controllers
         {
             var user = mapper.Map<ApplicationUser>(createConsultantRequest);
             return user;
+        }
+
+        [HttpPost]
+        public async Task<ApiResponse> LoginWithEmail(LoginModel loginModel)
+        {
+            var otpCode = await authService.LoginByEmail(loginModel.EmailAddress);
+            if (!string.IsNullOrEmpty(otpCode)) {
+                return new ApiResponse
+                {
+                    Success = true
+                };
+            }
+            else
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    ErrorCode = (int)ApiErrorCode.InvalidEmailAddress,
+                    ErrorMessage = "Invalid email address."
+                };
+            }
         }
     }
 }

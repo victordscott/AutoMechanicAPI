@@ -95,5 +95,26 @@ namespace AutoMechanic.Auth.Services
                 RefreshToken = refreshToken
             };
         }
+
+        public async Task<string> LoginByEmail(string emailAddress)
+        {
+            var user = await userService.GetUserByUserEmailAsync(emailAddress);
+            if (user is not null)
+            {
+                var otpCode = GenerateOtpCode();
+                await userService.InsertUserLoginOTPCodeAsync(user.UserId.Value, otpCode);
+                return otpCode;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private string GenerateOtpCode(int length = 6)
+        {
+            Random random = new Random();
+            return random.Next(0, (int)Math.Pow(10, length)).ToString("D" + length);
+        }
     }
 }

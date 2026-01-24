@@ -8,7 +8,9 @@ CREATE OR REPLACE VIEW user_detail AS
 SELECT 
     a."Id" as "UserId",
     a."UserName",
+	a."NormalizedUserName",
     a."Email",
+	a."NormalizedEmail",
 	a."EmailConfirmed",
 	a."FirstName",
     a."LastName",
@@ -35,7 +37,9 @@ CREATE OR REPLACE VIEW consultant_info AS
 SELECT 
     a."Id" as "UserId",
     a."UserName",
+	a."NormalizedUserName",
     a."Email",
+	a."NormalizedEmail",
 	a."EmailConfirmed",
 	a."FirstName",
     a."LastName",

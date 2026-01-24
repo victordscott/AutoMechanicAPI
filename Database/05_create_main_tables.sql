@@ -224,3 +224,15 @@ CREATE TABLE user_file (
     CONSTRAINT fk_user_file_upload_file FOREIGN KEY (file_upload_id) REFERENCES file_upload(file_upload_id)
 );
 
+DROP TABLE IF EXISTS user_login_otp_code CASCADE;
+CREATE TABLE user_login_otp_code (
+	user_login_otp_code_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	user_id UUID NOT NULL,
+	otp_code TEXT NOT NULL,
+	otp_code_create_date timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
+	otp_code_expire_date timestamptz NOT NULL,
+	otp_code_used bool NOT NULL DEFAULT false,
+	CONSTRAINT fk_user_login_otp_code_user FOREIGN KEY (user_id) REFERENCES "AspNetUsers"("Id")
+);
+
+

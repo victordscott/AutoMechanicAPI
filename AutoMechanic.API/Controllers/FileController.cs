@@ -138,7 +138,7 @@ namespace AutoMechanic.API.Controllers
             return base.Content(JsonSerializer.Serialize(results), "application/json", Encoding.UTF8);
         }
 
-        private dynamic SaveImage(
+        private async Task<dynamic> SaveImage(
             Stream stream,
             string originalFileName,
             string uploadDir,
@@ -152,7 +152,7 @@ namespace AutoMechanic.API.Controllers
 
             using (FileStream fileStream = System.IO.File.Create(Path.Combine(uploadDir, fileName)))
             {
-                stream.CopyTo(fileStream);
+                await stream.CopyToAsync(fileStream);
                 fileSize = fileStream.Length;
             }
             stream.Close();

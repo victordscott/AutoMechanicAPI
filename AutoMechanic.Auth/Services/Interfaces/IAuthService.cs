@@ -11,5 +11,6 @@ namespace AutoMechanic.Auth.Services.Interfaces
     {
         public Task<AuthResponse> LoginAsync(LoginModel loginModel);
         public Task<AuthResponse> RefreshTokenAsync(TokenModel tokenModel);
+        public Task<string> LoginByEmail(string emailAddress);
     }
 }

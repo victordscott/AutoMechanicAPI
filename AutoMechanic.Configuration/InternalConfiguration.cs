@@ -15,5 +15,9 @@ public static class InternalConfiguration
         services.AddOptions<JWTOptions>()
             .Bind(configuration.GetSection(JWTOptions.JWT))
             .ValidateDataAnnotations();
+
+        services.AddOptions<MiscOptions>()
+            .Bind(configuration.GetSection(MiscOptions.Misc))
+            .ValidateDataAnnotations();
     }
 }

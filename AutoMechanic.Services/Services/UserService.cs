@@ -1,18 +1,21 @@
 ﻿using AutoMapper;
+using AutoMechanic.Configuration.Options;
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Interfaces;
 using AutoMechanic.Services.Services.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoMechanic.Services.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
+    public class UserService(IUserRepository userRepository, IOptions<MiscOptions> miscOptions, IMapper mapper) : IUserService
     {
         public async Task<UserDetail?> GetUserByIdAsync(Guid userId)
         {
@@ -22,6 +25,21 @@ namespace AutoMechanic.Services.Services
         public async Task<UserDetail?> GetUserByUserNameAsync(string userName)
         {
             return await userRepository.GetUserByUserNameAsync(userName);
+        }
+
+        public async Task<UserDetail?> GetUserByUserEmailAsync(string emailAddress)
+        {
+            return await userRepository.GetUserByUserEmailAsync(emailAddress);
+        }
+
+        public async Task<bool> InsertUserLoginOTPCodeAsync(Guid userId, string otpCode)
+        {
+            return await userRepository.InsertUserLoginOTPCodeAsync(userId, otpCode, miscOptions.Value.OTPCodeExpireMinutes);
+        }
+
+        public async Task<bool> VerifyUserLoginOTPCodeAsync(Guid userId, string otpCode)
+        {
+            return await userRepository.VerifyUserLoginOTPCodeAsync(userId, otpCode);
         }
 
         public async Task SaveUserRefreshTokenAsync(Guid userId, string refreshToken, DateTime expiryTime)

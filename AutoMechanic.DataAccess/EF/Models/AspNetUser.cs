@@ -75,6 +75,8 @@ public partial class AspNetUser
 
     public virtual ICollection<UserFile> UserFiles { get; set; } = new List<UserFile>();
 
+    public virtual ICollection<UserLoginOtpCode> UserLoginOtpCodes { get; set; } = new List<UserLoginOtpCode>();
+
     public virtual ICollection<UserLogin> UserLogins { get; set; } = new List<UserLogin>();
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();

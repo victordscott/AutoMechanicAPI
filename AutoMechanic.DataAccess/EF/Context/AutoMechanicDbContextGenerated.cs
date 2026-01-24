@@ -61,6 +61,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
     public virtual DbSet<UserLogin> UserLogins { get; set; }
 
+    public virtual DbSet<UserLoginOtpCode> UserLoginOtpCodes { get; set; }
+
     public virtual DbSet<Vehicle> Vehicles { get; set; }
 
     public virtual DbSet<VehicleFile> VehicleFiles { get; set; }
@@ -423,6 +425,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
             entity.Property(e => e.ConsultantDescription).HasColumnName("consultant_description");
             entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
             entity.Property(e => e.PrimaryImageFileName).HasColumnName("primary_image_file_name");
             entity.Property(e => e.PrimaryImageFileNote).HasColumnName("primary_image_file_note");
             entity.Property(e => e.PrimaryImageFileTypeId).HasColumnName("primary_image_file_type_id");
@@ -580,6 +584,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .ToView("user_detail");
 
             entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
             entity.Property(e => e.RoleName).HasMaxLength(256);
             entity.Property(e => e.TimeZoneAbbreviation)
                 .HasMaxLength(10)
@@ -641,6 +647,31 @@ public partial class AutoMechanicDbContextGenerated : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_user_login_user");
+        });
+
+        modelBuilder.Entity<UserLoginOtpCode>(entity =>
+        {
+            entity.HasKey(e => e.UserLoginOtpCodeId).HasName("user_login_otp_code_pkey");
+
+            entity.ToTable("user_login_otp_code");
+
+            entity.Property(e => e.UserLoginOtpCodeId)
+                .HasDefaultValueSql("uuid_generate_v4()")
+                .HasColumnName("user_login_otp_code_id");
+            entity.Property(e => e.OtpCode).HasColumnName("otp_code");
+            entity.Property(e => e.OtpCodeCreateDate)
+                .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
+                .HasColumnName("otp_code_create_date");
+            entity.Property(e => e.OtpCodeExpireDate).HasColumnName("otp_code_expire_date");
+            entity.Property(e => e.OtpCodeUsed)
+                .HasDefaultValue(false)
+                .HasColumnName("otp_code_used");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserLoginOtpCodes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_login_otp_code_user");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
