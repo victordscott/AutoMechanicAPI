@@ -9,8 +9,8 @@ namespace AutoMechanic.Auth.Models
     public class LoginModel
     {
         public string UserName { get; set; }
-
         public string Password { get; set; }
         public string EmailAddress { get; set; }
+        public string OTPCode { get; set; }
     }
 }

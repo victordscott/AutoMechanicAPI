@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,34 +28,53 @@ namespace AutoMechanic.Auth.Services
             var user = await userManager.FindByNameAsync(loginModel.UserName);
             if (user != null && await userManager.CheckPasswordAsync(user, loginModel.Password))
             {
-                var userRoles = await userManager.GetRolesAsync(user);
-                var userDetail = await userService.GetUserByIdAsync(user.Id);
+                return await GetToken(user);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim("username", user.UserName),
-                    new Claim("name", $"{user.FirstName} {user.LastName}"),
-                    new Claim("role", userRoles[0]),    // users will only have one role
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.ZoneInfo, userDetail.TimeZoneName)
-                };
+                //var userRoles = await userManager.GetRolesAsync(user);
+                //var userDetail = await userService.GetUserByIdAsync(user.Id);
 
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
+                //var authClaims = new List<Claim>
+                //{
+                //    new Claim(ClaimTypes.Name, user.UserName),
+                //    new Claim("username", user.UserName),
+                //    new Claim("name", $"{user.FirstName} {user.LastName}"),
+                //    new Claim("role", userRoles[0]),    // users will only have one role
+                //    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                //    new Claim(JwtRegisteredClaimNames.ZoneInfo, userDetail.TimeZoneName)
+                //};
 
-                var jwtToken = tokenService.GenerateAccessToken(authClaims);
-                var refreshToken = await tokenService.GenerateRefreshToken(user.Id);
-                var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+                //foreach (var userRole in userRoles)
+                //{
+                //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                //}
 
+                //var jwtToken = tokenService.GenerateAccessToken(authClaims);
+                //var refreshToken = await tokenService.GenerateRefreshToken(user.Id);
+                //var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+                //return new AuthResponse
+                //{
+                //    AccessToken = token,
+                //    RefreshToken = refreshToken
+                //};
+            }
+            else
+            {
                 return new AuthResponse
                 {
-                    AccessToken = token,
-                    RefreshToken = refreshToken
+                    Succeeded = false,
+                    Message = "Invalid credentials"
                 };
+            }
+        }
+
+        public async Task<AuthResponse> LoginByOTPCode(LoginModel loginModel)
+        {
+            var user = await userManager.FindByEmailAsync(loginModel.EmailAddress);
+            if (user != null && await userService.VerifyUserLoginOTPCodeAsync(user.Id, loginModel.OTPCode))
+            {
+                return await GetToken(user);
             }
             else
             {
@@ -96,7 +116,7 @@ namespace AutoMechanic.Auth.Services
             };
         }
 
-        public async Task<string> LoginByEmail(string emailAddress)
+        public async Task<string> GetOTPCodeForLogin(string emailAddress)
         {
             var user = await userService.GetUserByUserEmailAsync(emailAddress);
             if (user is not null)
@@ -109,6 +129,38 @@ namespace AutoMechanic.Auth.Services
             {
                 return null;
             }
+        }
+
+        private async Task<AuthResponse> GetToken(ApplicationUser user)
+        {
+            var userRoles = await userManager.GetRolesAsync(user);
+            var userDetail = await userService.GetUserByIdAsync(user.Id);
+
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim("username", user.UserName),
+                    new Claim("name", $"{user.FirstName} {user.LastName}"),
+                    new Claim("role", userRoles[0]),    // users will only have one role
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.ZoneInfo, userDetail.TimeZoneName)
+                };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var jwtToken = tokenService.GenerateAccessToken(authClaims);
+            var refreshToken = await tokenService.GenerateRefreshToken(user.Id);
+            var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            return new AuthResponse
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken
+            };
         }
 
         private string GenerateOtpCode(int length = 6)

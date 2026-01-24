@@ -38,9 +38,9 @@ namespace AutoMechanic.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiResponse> LoginWithEmail(LoginModel loginModel)
+        public async Task<ApiResponse> GetOTPCodeForLogin(LoginModel loginModel)
         {
-            var otpCode = await authService.LoginByEmail(loginModel.EmailAddress);
+            var otpCode = await authService.GetOTPCodeForLogin(loginModel.EmailAddress);
             if (!string.IsNullOrEmpty(otpCode)) {
                 return new ApiResponse
                 {
@@ -56,6 +56,13 @@ namespace AutoMechanic.API.Controllers
                     ErrorMessage = "Invalid email address."
                 };
             }
+        }
+
+        [HttpPost]
+        public async Task<AuthResponse> LoginWithOTPCode(LoginModel loginModel)
+        {
+            var authResponse = await authService.LoginByOTPCode(loginModel);
+            return authResponse;
         }
     }
 }
