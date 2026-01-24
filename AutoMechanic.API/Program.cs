@@ -108,11 +108,17 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    // prevents lowercase first letter
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-});
+builder.Services
+    .AddControllers(options => {
+        // https://stackoverflow.com/a/72981145/2030207
+        // prevents web api validation of model objects
+        // One or more validation errors occurred... The ... field is required.
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; }
+    ).AddJsonOptions(options =>
+    {
+        // prevents lowercase first letter
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

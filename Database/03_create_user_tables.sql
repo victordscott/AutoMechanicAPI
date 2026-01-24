@@ -31,8 +31,12 @@ CREATE TABLE "AspNetUsers" (
 	"DateCreated" timestamptz NOT NULL default (now() at time zone 'utc'),
 	"IsEnabled" bool NOT NULL default true,
 	"IsActive" bool NOT NULL default true,
-	FOREIGN KEY ("TimeZoneId") REFERENCES time_zone(time_zone_id)
+	FOREIGN KEY ("TimeZoneId") REFERENCES time_zone(time_zone_id),
+	UNIQUE ("Email")
 );
+
+--ALTER TABLE "AspNetUsers"
+--	ADD CONSTRAINT unique_email UNIQUE ("Email");
 
 -- Roles Table
 CREATE TABLE "AspNetRoles" (

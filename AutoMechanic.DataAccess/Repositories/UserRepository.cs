@@ -52,6 +52,7 @@ namespace AutoMechanic.DataAccess.Repositories
                         OtpCodeUsed = false
                     }
                 );
+                await dbContext.SaveChangesAsync();
             }
             return true;
         }
