@@ -192,7 +192,7 @@ namespace AutoMechanic.API.Controllers
         [HttpGet]
         public async Task<dynamic> SetAllUserPasswords()
         {
-            var password = "";
+            var password = "Vst!1971@";
             IEnumerable<ApplicationUser> users = userManager.Users;
             foreach (var user in users.ToList())
             {

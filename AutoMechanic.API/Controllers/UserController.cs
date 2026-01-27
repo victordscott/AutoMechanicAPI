@@ -53,7 +53,7 @@ namespace AutoMechanic.API.Controllers
                 Country = regModel.Country,
                 EmailConfirmed = false,
                 PhoneNumberConfirmed = false,
-                TimeZoneId = regModel.TimeZoneId,
+                TimeZoneAbbrev = regModel.TimeZoneAbbrev,
                 DateCreated = DateTime.UtcNow
             }, password);
             if (createResult.Succeeded)

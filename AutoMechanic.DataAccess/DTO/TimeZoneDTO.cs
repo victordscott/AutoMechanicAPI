@@ -8,7 +8,6 @@ namespace AutoMechanic.DataAccess.DTO
 {
     public class TimeZoneDTO
     {
-        public short TimeZoneId { get; set; }
         public string TimeZoneAbbrev { get; set; }
         public string TimeZoneName { get; set; }
         public string TimeZoneIana { get; set; }

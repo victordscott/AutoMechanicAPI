@@ -16,6 +16,6 @@ namespace AutoMechanic.Auth.Models
         public string PhoneNumber { get; set; }
         public string State { get; set; }
         public string Country { get; set; }
-        public short TimeZoneId { get; set; }
+        public string TimeZoneAbbrev { get; set; }
     }
 }
