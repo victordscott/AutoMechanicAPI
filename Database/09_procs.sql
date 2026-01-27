@@ -37,6 +37,6 @@ BEGIN
 	end if;
 END $$;
 
-select delete_user_by_email('victord_scott@yahoo.com');
+
 
 

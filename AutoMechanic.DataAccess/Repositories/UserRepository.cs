@@ -64,7 +64,7 @@ namespace AutoMechanic.DataAccess.Repositories
                 var userLoginOtpCode = await dbContext.UserLoginOtpCodes.Where(u => u.UserId == userId 
                     && u.OtpCode == otpCode 
                     && u.OtpCodeUsed == false
-                    && u.OtpCodeExpireDate < DateTime.UtcNow
+                    && u.OtpCodeExpireDate > DateTime.UtcNow
                     ).FirstOrDefaultAsync();
 
                 if (userLoginOtpCode is not null)
