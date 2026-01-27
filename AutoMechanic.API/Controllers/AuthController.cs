@@ -53,22 +53,7 @@ namespace AutoMechanic.API.Controllers
         [HttpPost]
         public async Task<ApiResponse> GetOTPCodeForLogin(LoginModel loginModel)
         {
-            var otpCode = await authService.GetOTPCodeForLogin(loginModel.EmailAddress);
-            if (!string.IsNullOrEmpty(otpCode)) {
-                return new ApiResponse
-                {
-                    Success = true
-                };
-            }
-            else
-            {
-                return new ApiResponse
-                {
-                    Success = false,
-                    ErrorCode = (int)ApiErrorCode.InvalidEmailAddress,
-                    ErrorMessage = "Invalid email address."
-                };
-            }
+            return await authService.GetOTPCodeForLogin(loginModel.EmailAddress);
         }
 
         [AllowAnonymous]
@@ -130,6 +115,7 @@ namespace AutoMechanic.API.Controllers
                 var addToRoleResult = await userManager.AddToRoleAsync(user, "Customer");
                 if (addToRoleResult.Succeeded)
                 {
+                    await authService.GetOTPCodeForLogin(regModel.EmailAddress);
                     return new ApiResponse
                     {
                         Success = true

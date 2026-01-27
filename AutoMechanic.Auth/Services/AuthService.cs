@@ -1,5 +1,6 @@
 ﻿using AutoMechanic.Auth.Models;
 using AutoMechanic.Auth.Services.Interfaces;
+using AutoMechanic.Common.Enums;
 using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Models;
 using AutoMechanic.Services.Services;
@@ -116,18 +117,26 @@ namespace AutoMechanic.Auth.Services
             };
         }
 
-        public async Task<string> GetOTPCodeForLogin(string emailAddress)
+        public async Task<ApiResponse> GetOTPCodeForLogin(string emailAddress)
         {
             var user = await userService.GetUserByUserEmailAsync(emailAddress);
             if (user is not null)
             {
                 var otpCode = GenerateOtpCode();
                 await userService.InsertUserLoginOTPCodeAsync(user.UserId.Value, otpCode);
-                return otpCode;
+                return new ApiResponse
+                {
+                    Success = true
+                };
             }
             else
             {
-                return null;
+                return new ApiResponse
+                {
+                    Success = false,
+                    ErrorCode = (int)ApiErrorCode.InvalidEmailAddress,
+                    ErrorMessage = "Invalid email address."
+                };
             }
         }
 

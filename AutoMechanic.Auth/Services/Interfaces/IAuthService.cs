@@ -11,7 +11,7 @@ namespace AutoMechanic.Auth.Services.Interfaces
     {
         public Task<AuthResponse> LoginAsync(LoginModel loginModel);
         public Task<AuthResponse> RefreshTokenAsync(TokenModel tokenModel);
-        public Task<string> GetOTPCodeForLogin(string emailAddress);
+        public Task<ApiResponse> GetOTPCodeForLogin(string emailAddress);
         public Task<AuthResponse> LoginByOTPCode(LoginModel loginModel);
     }
 }

@@ -2,7 +2,7 @@
 -- These views provide convenient access to commonly queried data
 
 -- View for user information with type and timezone details
-DROP VIEW user_detail;
+--DROP VIEW user_detail;
 
 CREATE OR REPLACE VIEW user_detail AS
 SELECT 
@@ -31,7 +31,7 @@ JOIN "AspNetUserRoles" b ON a."Id" = b."UserId"
 JOIN "AspNetRoles" c ON b."RoleId" = c."Id"
 JOIN supported_time_zone d ON a."TimeZoneAbbrev" = d.time_zone_abbrev;
 
-DROP VIEW consultant_info;
+--DROP VIEW consultant_info;
 
 CREATE OR REPLACE VIEW consultant_info AS
 SELECT 
