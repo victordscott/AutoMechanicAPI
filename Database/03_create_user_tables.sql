@@ -23,7 +23,7 @@ CREATE TABLE "AspNetUsers" (
 	"PhoneNumberConfirmed" BOOLEAN NOT NULL DEFAULT FALSE,
 	"State" TEXT NOT NULL,
 	"Country" TEXT NOT NULL,
-	"TimeZoneId" smallint NOT NULL,
+	"TimeZoneAbbrev" TEXT NOT NULL,
     "TwoFactorEnabled" BOOLEAN NOT NULL DEFAULT FALSE,
     "LockoutEnd" TIMESTAMP,
     "LockoutEnabled" BOOLEAN NOT NULL DEFAULT FALSE,
@@ -31,7 +31,7 @@ CREATE TABLE "AspNetUsers" (
 	"DateCreated" timestamptz NOT NULL default (now() at time zone 'utc'),
 	"IsEnabled" bool NOT NULL default true,
 	"IsActive" bool NOT NULL default true,
-	FOREIGN KEY ("TimeZoneId") REFERENCES time_zone(time_zone_id),
+	FOREIGN KEY ("TimeZoneAbbrev") REFERENCES supported_time_zone(time_zone_abbrev),
 	UNIQUE ("Email")
 );
 

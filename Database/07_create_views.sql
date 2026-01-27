@@ -18,18 +18,18 @@ SELECT
     a."PhoneNumberConfirmed",
 	a."State",
 	a."Country",
-	a."TimeZoneId",
+	a."TimeZoneAbbrev",
 	a."DateCreated",
 	a."IsEnabled",
 	a."IsActive",
 	b."RoleId",
 	c."Name" as "RoleName",
     d.time_zone_name,
-    d.time_zone_abbreviation
+    d.time_zone_iana
 FROM "AspNetUsers" a
 JOIN "AspNetUserRoles" b ON a."Id" = b."UserId"
 JOIN "AspNetRoles" c ON b."RoleId" = c."Id"
-JOIN time_zone d ON a."TimeZoneId" = d.time_zone_id;
+JOIN supported_time_zone d ON a."TimeZoneAbbrev" = d.time_zone_abbrev;
 
 DROP VIEW consultant_info;
 
@@ -47,14 +47,14 @@ SELECT
     a."PhoneNumberConfirmed",
 	a."State",
 	a."Country",
-	a."TimeZoneId",
+	a."TimeZoneAbbrev",
 	a."DateCreated",
 	a."IsEnabled",
 	a."IsActive",
 	b."RoleId",
 	c."Name" as "RoleName",
     d.time_zone_name,
-    d.time_zone_abbreviation,
+    d.time_zone_iana,
 	e.description as "consultant_description",
 	e.primary_image_upload_id,
 	e.primary_video_upload_id,
@@ -67,7 +67,7 @@ SELECT
 FROM "AspNetUsers" a
 JOIN "AspNetUserRoles" b ON a."Id" = b."UserId"
 JOIN "AspNetRoles" c ON b."RoleId" = c."Id"
-JOIN time_zone d ON a."TimeZoneId" = d.time_zone_id
+JOIN supported_time_zone d ON a."TimeZoneAbbrev" = d.time_zone_abbrev
 JOIN consultant_detail e on a."Id" = e.user_id
 LEFT JOIN file_upload f on e.primary_image_upload_id = f.file_upload_id
 LEFT JOIN file_upload g on e.primary_video_upload_id = g.file_upload_id

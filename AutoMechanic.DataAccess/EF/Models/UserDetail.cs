@@ -29,7 +29,7 @@ public partial class UserDetail
 
     public string? Country { get; set; }
 
-    public short? TimeZoneId { get; set; }
+    public string? TimeZoneAbbrev { get; set; }
 
     public DateTime? DateCreated { get; set; }
 
@@ -43,5 +43,5 @@ public partial class UserDetail
 
     public string? TimeZoneName { get; set; }
 
-    public string? TimeZoneAbbreviation { get; set; }
+    public string? TimeZoneIana { get; set; }
 }

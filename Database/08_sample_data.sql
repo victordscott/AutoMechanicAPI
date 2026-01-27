@@ -4,10 +4,10 @@
 -- Insert sample users
 
 INSERT INTO "AspNetUsers"(
-	"UserName", "NormalizedUserName", "Email", "NormalizedEmail", "EmailConfirmed", "FirstName", "LastName", "PhoneNumber", "PhoneNumberConfirmed", "State", "Country", "TimeZoneId", "TwoFactorEnabled", "LockoutEnabled", "AccessFailedCount") VALUES 
+	"UserName", "NormalizedUserName", "Email", "NormalizedEmail", "EmailConfirmed", "FirstName", "LastName", "PhoneNumber", "PhoneNumberConfirmed", "State", "Country", "TimeZoneAbbrev", "TwoFactorEnabled", "LockoutEnabled", "AccessFailedCount") VALUES 
 
 -- Administrators
-('victordscott', '', 'victordscott@gmail.com', '', true, 'Victor', 'Scott', '678-472-9866', true, 'GA', 'US', 2, false, true, 0);
+('victordscott', '', 'victordscott@gmail.com', '', true, 'Victor', 'Scott', '678-472-9866', true, 'GA', 'US', 'EST', false, true, 0);
 
 INSERT INTO "AspNetUserRoles"(
 	"UserId", "RoleId") VALUES 

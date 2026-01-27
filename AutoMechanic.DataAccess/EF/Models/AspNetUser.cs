@@ -35,7 +35,7 @@ public partial class AspNetUser
 
     public string Country { get; set; } = null!;
 
-    public short TimeZoneId { get; set; }
+    public string TimeZoneAbbrev { get; set; } = null!;
 
     public bool TwoFactorEnabled { get; set; }
 
@@ -71,7 +71,7 @@ public partial class AspNetUser
 
     public virtual ICollection<FileUpload> FileUploads { get; set; } = new List<FileUpload>();
 
-    public virtual TimeZone TimeZone { get; set; } = null!;
+    public virtual SupportedTimeZone TimeZoneAbbrevNavigation { get; set; } = null!;
 
     public virtual ICollection<UserFile> UserFiles { get; set; } = new List<UserFile>();
 

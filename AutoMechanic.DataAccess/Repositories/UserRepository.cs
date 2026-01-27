@@ -142,11 +142,11 @@ namespace AutoMechanic.DataAccess.Repositories
             }
         }
 
-        public async Task<List<EF.Models.TimeZone>> GetTimeZonesAsync()
+        public async Task<List<EF.Models.SupportedTimeZone>> GetTimeZonesAsync()
         {
             using (var dbContext = dbContextFactory.CreateDbContext())
             {
-               return await dbContext.TimeZones.ToListAsync();
+               return await dbContext.SupportedTimeZones.ToListAsync();
             }
         }
     }

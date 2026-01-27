@@ -18,6 +18,6 @@ namespace AutoMechanic.DataAccess.Interfaces
         Task<bool> UserRefreshTokenExists(Guid userId, string refreshToken);
         Task<bool> DeleteUserRefreshToken(Guid userId, string refreshToken);
         Task<List<UserDetail>> GetConsultantsAsync();
-        Task<List<EF.Models.TimeZone>> GetTimeZonesAsync();
+        Task<List<EF.Models.SupportedTimeZone>> GetTimeZonesAsync();
     }
 }

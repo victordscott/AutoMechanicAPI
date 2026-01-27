@@ -1,5 +1,4 @@
-using TimeZone = AutoMechanic.DataAccess.EF.Models.TimeZone;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using AutoMechanic.DataAccess.EF.Models;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +52,7 @@ public partial class AutoMechanicDbContextGenerated : DbContext
 
     public virtual DbSet<ServiceLength> ServiceLengths { get; set; }
 
-    public virtual DbSet<TimeZone> TimeZones { get; set; }
+    public virtual DbSet<SupportedTimeZone> SupportedTimeZones { get; set; }
 
     public virtual DbSet<UserDetail> UserDetails { get; set; }
 
@@ -264,6 +263,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
         {
             entity.HasKey(e => e.Id).HasName("AspNetUsers_pkey");
 
+            entity.HasIndex(e => e.Email, "AspNetUsers_Email_key").IsUnique();
+
             entity.Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
             entity.Property(e => e.AccessFailedCount).HasDefaultValue(0);
             entity.Property(e => e.DateCreated).HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)");
@@ -279,10 +280,10 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.TwoFactorEnabled).HasDefaultValue(false);
             entity.Property(e => e.UserName).HasMaxLength(256);
 
-            entity.HasOne(d => d.TimeZone).WithMany(p => p.AspNetUsers)
-                .HasForeignKey(d => d.TimeZoneId)
+            entity.HasOne(d => d.TimeZoneAbbrevNavigation).WithMany(p => p.AspNetUsers)
+                .HasForeignKey(d => d.TimeZoneAbbrev)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("AspNetUsers_TimeZoneId_fkey");
+                .HasConstraintName("AspNetUsers_TimeZoneAbbrev_fkey");
 
             entity.HasMany(d => d.Roles).WithMany(p => p.Users)
                 .UsingEntity<Dictionary<string, object>>(
@@ -436,12 +437,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.PrimaryVideoFileTypeId).HasColumnName("primary_video_file_type_id");
             entity.Property(e => e.PrimaryVideoUploadId).HasColumnName("primary_video_upload_id");
             entity.Property(e => e.RoleName).HasMaxLength(256);
-            entity.Property(e => e.TimeZoneAbbreviation)
-                .HasMaxLength(10)
-                .HasColumnName("time_zone_abbreviation");
-            entity.Property(e => e.TimeZoneName)
-                .HasMaxLength(100)
-                .HasColumnName("time_zone_name");
+            entity.Property(e => e.TimeZoneIana).HasColumnName("time_zone_iana");
+            entity.Property(e => e.TimeZoneName).HasColumnName("time_zone_name");
             entity.Property(e => e.UserName).HasMaxLength(256);
         });
 
@@ -546,35 +543,15 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.ServiceLengthName).HasColumnName("service_length_name");
         });
 
-        modelBuilder.Entity<TimeZone>(entity =>
+        modelBuilder.Entity<SupportedTimeZone>(entity =>
         {
-            entity.HasKey(e => e.TimeZoneId).HasName("time_zone_pkey");
+            entity.HasKey(e => e.TimeZoneAbbrev).HasName("supported_time_zone_pkey");
 
-            entity.ToTable("time_zone");
+            entity.ToTable("supported_time_zone");
 
-            entity.HasIndex(e => e.TimeZoneName, "idx_time_zone_name");
-
-            entity.HasIndex(e => e.TimeZoneName, "time_zone_time_zone_name_key").IsUnique();
-
-            entity.Property(e => e.TimeZoneId)
-                .ValueGeneratedNever()
-                .HasColumnName("time_zone_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("created_at");
-            entity.Property(e => e.IsDst)
-                .HasDefaultValue(false)
-                .HasColumnName("is_dst");
-            entity.Property(e => e.TimeZoneAbbreviation)
-                .HasMaxLength(10)
-                .HasColumnName("time_zone_abbreviation");
-            entity.Property(e => e.TimeZoneName)
-                .HasMaxLength(100)
-                .HasColumnName("time_zone_name");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.UtcOffset).HasColumnName("utc_offset");
+            entity.Property(e => e.TimeZoneAbbrev).HasColumnName("time_zone_abbrev");
+            entity.Property(e => e.TimeZoneIana).HasColumnName("time_zone_iana");
+            entity.Property(e => e.TimeZoneName).HasColumnName("time_zone_name");
         });
 
         modelBuilder.Entity<UserDetail>(entity =>
@@ -587,12 +564,8 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
             entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
             entity.Property(e => e.RoleName).HasMaxLength(256);
-            entity.Property(e => e.TimeZoneAbbreviation)
-                .HasMaxLength(10)
-                .HasColumnName("time_zone_abbreviation");
-            entity.Property(e => e.TimeZoneName)
-                .HasMaxLength(100)
-                .HasColumnName("time_zone_name");
+            entity.Property(e => e.TimeZoneIana).HasColumnName("time_zone_iana");
+            entity.Property(e => e.TimeZoneName).HasColumnName("time_zone_name");
             entity.Property(e => e.UserName).HasMaxLength(256);
         });
 

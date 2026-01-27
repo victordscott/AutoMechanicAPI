@@ -9,13 +9,8 @@ namespace AutoMechanic.DataAccess.DTO
     public class TimeZoneDTO
     {
         public short TimeZoneId { get; set; }
-
-        public string TimeZoneName { get; set; } = null!;
-
-        public string? TimeZoneAbbreviation { get; set; }
-
-        public TimeSpan? UtcOffset { get; set; }
-
-        public bool? IsDst { get; set; }
+        public string TimeZoneAbbrev { get; set; }
+        public string TimeZoneName { get; set; }
+        public string TimeZoneIana { get; set; }
     }
 }

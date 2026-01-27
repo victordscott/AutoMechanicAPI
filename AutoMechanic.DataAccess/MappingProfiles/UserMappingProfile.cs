@@ -33,7 +33,7 @@ namespace AutoMechanic.DataAccess.MappingProfiles
                 );
             CreateMap<ConsultantAvailabilityDateDTO, ConsultantAvailabilityDate>()
                 .ForMember(x => x.ConsultantAvailabilityDateId, expression => expression.Ignore());
-            CreateMap<EF.Models.TimeZone, TimeZoneDTO>();
+            CreateMap<EF.Models.SupportedTimeZone, TimeZoneDTO>();
         }
     }
 }

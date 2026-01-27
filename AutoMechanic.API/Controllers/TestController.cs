@@ -173,7 +173,7 @@ namespace AutoMechanic.API.Controllers
                 Country = "United States",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                TimeZoneId = 2
+                TimeZoneAbbrev = "EST"
             }, password);
             if (result.Succeeded)
             {
