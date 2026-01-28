@@ -108,6 +108,7 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddHttpClient();
 builder.Services
     .AddControllers(options => {
         // https://stackoverflow.com/a/72981145/2030207
