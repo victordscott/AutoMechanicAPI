@@ -36,5 +36,16 @@ namespace AutoMechanic.DataAccess.Repositories
 
             return vehicle.VehicleId;
         }
+
+        public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)
+        {
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                var vehicles = await dbContext.Vehicles
+                    .Where(v => v.CustomerId == customerId && !v.IsDeleted)
+                    .ToListAsync();
+                return mapper.Map<List<VehicleDTO>>(vehicles);
+            }
+        }
     }
 }
