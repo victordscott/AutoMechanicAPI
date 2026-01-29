@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AutoMechanic.CarAPI.Services.Interfaces
 {
-    internal interface ICarAPI
+    public interface ICarAPIService
     {
+        Task<List<int>> GetYears();
     }
 }

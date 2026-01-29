@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoMechanic.Auth\AutoMechanic.Auth.csproj" />
+    <ProjectReference Include="..\AutoMechanic.CarAPI\AutoMechanic.CarAPI.csproj" />
     <ProjectReference Include="..\AutoMechanic.DataAccess\AutoMechanic.DataAccess.csproj" />
     <ProjectReference Include="..\AutoMechanic.Services\AutoMechanic.Services.csproj" />
   </ItemGroup>

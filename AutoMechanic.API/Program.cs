@@ -3,6 +3,7 @@ using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using AutoMechanic.Auth;
+using AutoMechanic.CarAPI;
 using AutoMechanic.Common;
 using AutoMechanic.Configuration;
 using AutoMechanic.DataAccess;
@@ -73,7 +74,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .RegisterCommonDependencies(containerBuilder)
         .RegisterDataAccessDependencies(containerBuilder)
         .RegisterServicesDependencies(containerBuilder)
-        .RegisterAuthDependencies(containerBuilder);
+        .RegisterAuthDependencies(containerBuilder)
+        .RegisterCarAPIDependencies(containerBuilder);
 });
 
 Action<IMapperConfigurationExpression> configAction = null;

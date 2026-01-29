@@ -19,5 +19,9 @@ public static class InternalConfiguration
         services.AddOptions<MiscOptions>()
             .Bind(configuration.GetSection(MiscOptions.Misc))
             .ValidateDataAnnotations();
+
+        services.AddOptions<CarAPIOptions>()
+            .Bind(configuration.GetSection(CarAPIOptions.CarAPI))
+            .ValidateDataAnnotations();
     }
 }
