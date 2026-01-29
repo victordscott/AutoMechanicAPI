@@ -48,7 +48,8 @@ public static class DependencyLoader
         //    .InstancePerLifetimeScope();
         builder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
         builder.RegisterType<ConsultantRepository>().As<IConsultantRepository>().SingleInstance();
-
+        builder.RegisterType<VehicleRepository>().As<IVehicleRepository>().SingleInstance();
+        
         return services;
     }
 }

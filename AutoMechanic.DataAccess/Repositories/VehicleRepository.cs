@@ -1,5 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
+using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Context;
+using AutoMechanic.DataAccess.EF.Models;
+using AutoMechanic.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,8 +15,26 @@ namespace AutoMechanic.DataAccess.Repositories
     public class VehicleRepository(
         IDbContextFactory<AutoMechanicDbContext> dbContextFactory,
         IMapper mapper
-    )
+    ) : IVehicleRepository
     {
+        public async Task<Guid> AddVehicleAsync(VehicleDTO vehicleDto)
+        {
+            var vehicle = mapper.Map<Vehicle>(vehicleDto);
 
+            if (vehicle.VehicleId == Guid.Empty)
+                vehicle.VehicleId = Guid.NewGuid();
+
+            var now = DateTime.UtcNow;
+            vehicle.DateCreated = now;
+            vehicle.DateUpdated = now;
+
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                await dbContext.Vehicles.AddAsync(vehicle);
+                await dbContext.SaveChangesAsync();
+            }
+
+            return vehicle.VehicleId;
+        }
     }
 }

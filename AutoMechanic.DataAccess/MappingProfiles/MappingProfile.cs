@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Models;
@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace AutoMechanic.DataAccess.MappingProfiles
 {
-    public class UserMappingProfile : Profile
+    public class MappingProfile : Profile
     {
-        public UserMappingProfile()
+        public MappingProfile()
         {
             JsonSerializerOptions jso = null;
 
@@ -34,6 +34,7 @@ namespace AutoMechanic.DataAccess.MappingProfiles
             CreateMap<ConsultantAvailabilityDateDTO, ConsultantAvailabilityDate>()
                 .ForMember(x => x.ConsultantAvailabilityDateId, expression => expression.Ignore());
             CreateMap<EF.Models.SupportedTimeZone, TimeZoneDTO>();
+            CreateMap<VehicleDTO, Vehicle>();
         }
     }
 }
