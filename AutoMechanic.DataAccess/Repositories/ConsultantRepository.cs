@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AutoMechanic.DataAccess.Repositories
 {
-    internal class ConsultantRepository(
+    public class ConsultantRepository(
         IDbContextFactory<AutoMechanicDbContext> dbContextFactory, 
         IMapper mapper
     ) : IConsultantRepository
