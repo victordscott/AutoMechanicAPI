@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using AutoMechanic.DataAccess.DirectAccess;
 using AutoMechanic.DataAccess.EF.Context;
 using AutoMechanic.DataAccess.Interfaces;
@@ -20,6 +20,7 @@ namespace AutoMechanic.Services
         {
             builder.RegisterType<UserService>().As<IUserService>().SingleInstance();
             builder.RegisterType<ConsultantService>().As<IConsultantService>().SingleInstance();
+            builder.RegisterType<VehicleService>().As<IVehicleService>().SingleInstance();
 
             return services;
         }
