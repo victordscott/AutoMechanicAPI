@@ -22,5 +22,7 @@ CREATE TABLE IF NOT EXISTS logs
     "timestamp" timestamp without time zone,
     exception text COLLATE pg_catalog."default",
     log_event jsonb
-)
+);
+
+CREATE SCHEMA IF NOT EXISTS hangfire;
 
