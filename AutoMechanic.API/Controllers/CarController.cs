@@ -13,6 +13,7 @@ namespace AutoMechanic.API.Controllers
         [HttpGet]
         public async Task<List<int>> GetYears()
         {
+            System.Threading.Thread.Sleep(TimeSpan.FromSeconds(10));
             return await carAPIService.GetYears();
         }
 
