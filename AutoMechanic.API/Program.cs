@@ -22,6 +22,9 @@ using System.Security.Claims;
 using System.Text;
 using Hangfire;
 using Hangfire.PostgreSql;
+using AutoMechanic.Api.Hangfire;
+using AutoMechanic.API.Hangfire;
+using AutoMechanic.API;
 //using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,7 +80,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .RegisterDataAccessDependencies(containerBuilder)
         .RegisterServicesDependencies(containerBuilder)
         .RegisterAuthDependencies(containerBuilder)
-        .RegisterCarAPIDependencies(containerBuilder);
+        .RegisterCarAPIDependencies(containerBuilder)
+        .RegisterDependencies(containerBuilder);
 });
 
 Action<IMapperConfigurationExpression> configAction = null;
@@ -182,6 +186,12 @@ app.UseCors(cors => cors
     .AllowCredentials()
 );
 
+var dashboardPath = "/c9507469-aa53-4d0b-b34f-1196c28aa867";
+app.UseHangfireDashboard(dashboardPath, new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthFilter() }
+});
+
 app.UseHttpsRedirection();
 
 // sub claim issue fix
@@ -196,5 +206,12 @@ app.MapControllers();
 //{
 //    endpoints.MapControllers();
 //});
+
+RecurringJob.RemoveIfExists("test-job");
+//RecurringJob.AddOrUpdate<IHangfireTestJob>(
+//    "test-job",
+//    (x => x.TestJob()),
+//    "*/1 * * * *"
+//);
 
 app.Run();
