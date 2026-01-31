@@ -26,6 +26,13 @@ namespace AutoMechanic.API.Controllers
         IMapper mapper
     ) : ControllerBase
     {
+        [Authorize]
+        [HttpGet]
+        public IActionResult CheckLoggedIn()
+        {
+            return Ok();
+        }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<AuthResponse> Login(LoginModel loginModel)

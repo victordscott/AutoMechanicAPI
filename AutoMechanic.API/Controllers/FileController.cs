@@ -1,22 +1,34 @@
 ﻿using AutoMechanic.Api.Helpers;
 using AutoMechanic.Auth.Helpers;
+using AutoMechanic.Auth.Models;
+using AutoMechanic.Auth.Services;
+using AutoMechanic.Auth.Services.Interfaces;
+using AutoMechanic.Configuration.Options;
+using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebUtilities;
-
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using System.Web;
+//using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace AutoMechanic.API.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
     public class FileController(
-        IHostingEnvironment hostingEnvironment
+        IWebHostEnvironment hostingEnvironment,
+        IOptions<MiscOptions> miscOptions,
+        ITokenService tokenService,
+        ILogger<FileController> logger
     ) : ControllerBase
     {
         private static readonly FormOptions defaultFormOptions = new FormOptions();
@@ -136,6 +148,242 @@ namespace AutoMechanic.API.Controllers
             }
 
             return base.Content(JsonSerializer.Serialize(results), "application/json", Encoding.UTF8);
+        }
+
+        [Authorize]
+        [HttpGet("{urlPath}")]
+        public IActionResult GetFile(string urlPath)
+        {
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+            var fileName = Path.GetFileName(fileLocation);
+
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            if (!provider.TryGetContentType(fileLocation, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+
+            return PhysicalFile(fileLocation, contentType);
+        }
+
+        [HttpGet("{urlPath}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetFileByToken(string urlPath, string t)
+        {
+            var token = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(t));
+            try
+            {
+                var principal = tokenService.GetPrincipalFromToken(token, validateLifetime: true);
+                var userName = principal.Identity.Name;
+                var userId = Guid.Parse(principal.Claims.Where(c => c.Type == JwtRegisteredClaimNames.Sub).FirstOrDefault()?.Value);
+            }
+            catch (Exception ex)
+            {
+                //Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException
+                logger.LogError(ex, "GetFile");
+                return StatusCode(401);
+            }
+
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+            var fileName = Path.GetFileName(fileLocation);
+
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            if (!provider.TryGetContentType(fileLocation, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+
+            //return PhysicalFile(fileLocation, contentType, fileName);	// downloads instead of opening in new tab
+            var fileStream = System.IO.File.OpenRead(fileLocation);
+            Response.Headers.Append("Content-Disposition", "inline; filename=" + fileName);
+            return File(fileStream, contentType);
+        }
+
+        [Authorize]
+        [HttpGet("{urlPath}")]
+        public IActionResult GetImage(string urlPath)
+        {
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+
+            var imageResizer = new AutoMechanic.Api.Helpers.ImageResizer();
+            Dictionary<string, string> resizeParamDict = new Dictionary<string, string>();
+            resizeParamDict.Add("w", "1060");
+            resizeParamDict.Add("h", "550");
+            resizeParamDict.Add("mode", "max");
+            resizeParamDict.Add("rotation", "90");
+
+            byte[] b = imageResizer.Resize(fileLocation, resizeParamDict);
+            var base64String = "data:image/png;base64," + Convert.ToBase64String(b);
+            var data = new
+            {
+                base64Url = base64String
+            };
+            var resultJson = JsonSerializer.Serialize(data);
+            return base.Content(resultJson, "application/json", Encoding.UTF8);
+        }
+
+        [Authorize]
+        [HttpGet("{urlPath}")]
+        public IActionResult GetFullSizeImage(string urlPath)
+        {
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+
+            var b = System.IO.File.ReadAllBytes(fileLocation);
+            var base64String = "data:image/png;base64," + Convert.ToBase64String(b);
+            var data = new
+            {
+                base64Url = base64String
+            };
+            var resultJson = JsonSerializer.Serialize(data);
+            return base.Content(resultJson, "application/json", Encoding.UTF8);
+        }
+
+        [Authorize]
+        [HttpGet("{urlPath}/{rotation}")]
+        public IActionResult GetImageRotate(string urlPath, int rotation)
+        {
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+
+            var imageResizer = new AutoMechanic.Api.Helpers.ImageResizer();
+            Dictionary<string, string> resizeParamDict = new Dictionary<string, string>();
+            resizeParamDict.Add("w", "1060");
+            resizeParamDict.Add("h", "550");
+            resizeParamDict.Add("mode", "max");
+            resizeParamDict.Add("rotation", rotation.ToString());
+
+            byte[] b = imageResizer.Resize(fileLocation, resizeParamDict);
+            var base64String = "data:image/png;base64," + Convert.ToBase64String(b);
+            var data = new
+            {
+                base64Url = base64String
+            };
+            var resultJson = JsonSerializer.Serialize(data);
+            return base.Content(resultJson, "application/json", Encoding.UTF8);
+        }
+
+        [Authorize]
+        [HttpGet("{urlPath}/{rotation}")]
+        public IActionResult GetFullSizeImageRotate(string urlPath, int rotation)
+        {
+            string webRootPath = hostingEnvironment.WebRootPath;
+            string uploadDir = null;
+            if (miscOptions.Value.UseFileShare)
+            {
+                uploadDir = Path.Combine(miscOptions.Value.FileShareLocation, miscOptions.Value.UploadFolderName);
+            }
+            else
+            {
+                uploadDir = Path.Combine(hostingEnvironment.WebRootPath, "Upload");
+            }
+            urlPath = HttpUtility.UrlDecode(urlPath);
+            if (urlPath.Contains("?"))
+            {
+                urlPath = urlPath.Split('?').First();
+            }
+            urlPath = urlPath.Replace("/Upload/", string.Empty).Replace("/", "\\");
+            var fileLocation = Path.Combine(uploadDir, urlPath);
+
+            byte[] b = null;
+            if (rotation == 0)
+            {
+                b = System.IO.File.ReadAllBytes(fileLocation);
+            }
+            else
+            {
+                var imageResizer = new AutoMechanic.Api.Helpers.ImageResizer();
+                Dictionary<string, string> resizeParamDict = new Dictionary<string, string>();
+                resizeParamDict.Add("rotation", rotation.ToString());
+                b = imageResizer.Resize(fileLocation, resizeParamDict);
+            }
+            var base64String = "data:image/png;base64," + Convert.ToBase64String(b);
+            var data = new
+            {
+                base64Url = base64String
+            };
+            var resultJson = JsonSerializer.Serialize(data);
+            return base.Content(resultJson, "application/json", Encoding.UTF8);
         }
 
         private async Task<dynamic> SaveImage(

@@ -46,7 +46,7 @@ namespace AutoMechanic.Auth.Services
             return refreshToken;
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        public ClaimsPrincipal GetPrincipalFromToken(string token, bool validateLifetime)
         {
             //DefaultInboundClaimTypeMap
             //MapInboundClaims
@@ -56,7 +56,7 @@ namespace AutoMechanic.Auth.Services
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.Secret)),
-                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+                ValidateLifetime = validateLifetime // if false, we are saying that we don't care about the token's expiration date
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             tokenHandler.MapInboundClaims = false;  // fixes sub claim issue

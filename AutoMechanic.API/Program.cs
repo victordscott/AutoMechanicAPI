@@ -2,6 +2,9 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using AutoMechanic.Api.Hangfire;
+using AutoMechanic.API;
+using AutoMechanic.API.Hangfire;
 using AutoMechanic.Auth;
 using AutoMechanic.CarAPI;
 using AutoMechanic.Common;
@@ -10,6 +13,9 @@ using AutoMechanic.DataAccess;
 using AutoMechanic.DataAccess.EF.Context;
 using AutoMechanic.DataAccess.Models;
 using AutoMechanic.Services;
+using Hangfire;
+using Hangfire.PostgreSql;
+using ImageResizer.AspNetCore.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
@@ -20,11 +26,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Hangfire;
-using Hangfire.PostgreSql;
-using AutoMechanic.Api.Hangfire;
-using AutoMechanic.API.Hangfire;
-using AutoMechanic.API;
 //using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -193,6 +194,7 @@ app.UseHangfireDashboard(dashboardPath, new DashboardOptions
 });
 
 app.UseHttpsRedirection();
+app.UseImageResizer();
 
 // sub claim issue fix
 // https://stackoverflow.com/a/61900842/2030207

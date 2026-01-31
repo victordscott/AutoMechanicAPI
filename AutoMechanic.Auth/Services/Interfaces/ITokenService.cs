@@ -12,6 +12,6 @@ namespace AutoMechanic.Auth.Services.Interfaces
     {
         JwtSecurityToken GenerateAccessToken(List<Claim> claims);
         Task<string> GenerateRefreshToken(Guid userId);
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        ClaimsPrincipal GetPrincipalFromToken(string token, bool validateLifetime);
     }
 }

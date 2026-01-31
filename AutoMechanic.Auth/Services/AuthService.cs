@@ -89,7 +89,7 @@ namespace AutoMechanic.Auth.Services
 
         public async Task<AuthResponse> RefreshTokenAsync(TokenModel tokenModel)
         {
-            var principal = tokenService.GetPrincipalFromExpiredToken(tokenModel.AccessToken);
+            var principal = tokenService.GetPrincipalFromToken(tokenModel.AccessToken, validateLifetime: false);
             var userName = principal.Identity.Name;
             var userId = Guid.Parse(principal.Claims.Where(c => c.Type == JwtRegisteredClaimNames.Sub).FirstOrDefault()?.Value);
 
