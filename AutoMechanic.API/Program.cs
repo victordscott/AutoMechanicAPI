@@ -207,6 +207,7 @@ app.MapControllers();
 //    endpoints.MapControllers();
 //});
 
+// https://crontab.cronhub.io/
 RecurringJob.RemoveIfExists("test-job");
 //RecurringJob.AddOrUpdate<IHangfireTestJob>(
 //    "test-job",

@@ -19,19 +19,15 @@ namespace AutoMechanic.API.Controllers
             var userId = AuthHelper.GetUserIdFromPrincipal(User);
             vehicleDto.CustomerId = userId;
             var vehicleId = await vehicleService.AddVehicleAsync(vehicleDto);
-            return StatusCode(StatusCodes.Status201Created, vehicleId);
+            return StatusCode(StatusCodes.Status200OK, vehicleId);
         }
         
         [Authorize(Roles = "Customer")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<VehicleDTO>>> GetVehicleByCustomerId()
+        public async Task<ActionResult<IEnumerable<VehicleDTO>>> GetVehiclesByCustomerId()
         {
             var customerId = AuthHelper.GetUserIdFromPrincipal(User);
             var vehicles = await vehicleService.GetVehiclesByCustomerIdAsync(customerId);
-            if (vehicles == null || !vehicles.Any())
-            {
-                return NotFound();
-            }
             return Ok(vehicles);
         }
     }
