@@ -193,8 +193,11 @@ app.UseHangfireDashboard(dashboardPath, new DashboardOptions
     Authorization = new[] { new HangfireAuthFilter() }
 });
 
+//app.UseStaticFiles();
+
 app.UseHttpsRedirection();
-app.UseImageResizer();
+//app.UseImageResizer();
+app.UseUploadFolderAccess();
 
 // sub claim issue fix
 // https://stackoverflow.com/a/61900842/2030207

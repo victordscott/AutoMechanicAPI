@@ -1,21 +1,27 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using SkiaSharp;
-using System.Reflection;
-using ImageResizer.AspNetCore.Helpers;
-using ImageResizer.AspNetCore.Funcs;
-using Microsoft.Extensions.Options;
+﻿using AutoMechanic.Auth.Services;
+using AutoMechanic.Auth.Services.Interfaces;
 using AutoMechanic.Configuration.Options;
+using HeyRed.Mime;
+using ImageResizer.AspNetCore.Funcs;
+using ImageResizer.AspNetCore.Helpers;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using SkiaSharp;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Reflection;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace ImageResizer.AspNetCore
 {
-    public class ImageResizerMiddleware
+    public class UploadFolderAccessMiddleware
     {
 	    private readonly RequestDelegate _req;
         private readonly ILogger<ImageResizerMiddleware> _logger;
         private readonly IHostingEnvironment _env;
         private readonly IMemoryCache _memoryCache;
         private readonly IOptions<MiscOptions> miscOptions;
+        private readonly ITokenService _tokenService;
 
         private static readonly string[] suffixes = new string[] {
             ".png",
@@ -23,44 +29,75 @@ namespace ImageResizer.AspNetCore
             ".jpeg"
         };
 
-        public ImageResizerMiddleware(RequestDelegate req, IHostingEnvironment env, ILogger<ImageResizerMiddleware> logger, IMemoryCache memoryCache, IOptions<MiscOptions> miscOptions)
+        public UploadFolderAccessMiddleware(
+            RequestDelegate req, 
+            IHostingEnvironment env, 
+            ILogger<ImageResizerMiddleware> logger, 
+            IMemoryCache memoryCache, 
+            IOptions<MiscOptions> miscOptions,
+            ITokenService tokenService
+        )
         {
             _req = req;
             _env = env;
             _logger = logger;
             _memoryCache = memoryCache;
             this.miscOptions = miscOptions;
+            _tokenService = tokenService;
         }
 
         public async Task Invoke(HttpContext context)
         {
             var path = context.Request.Path;
 
+
+            if (!path.ToString().ToLower().Contains("/upload/"))
+            {
+                await _req.Invoke(context);
+                return;
+            }
+
+            var tokenEncoded = GetToken(context.Request.Query);
+            if (string.IsNullOrEmpty(tokenEncoded))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                await context.Response.StartAsync();
+                return;
+            }
+
+            var token = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(tokenEncoded));
+            try
+            {
+                var principal = _tokenService.GetPrincipalFromToken(token, validateLifetime: true);
+                var userName = principal.Identity.Name;
+                var userId = Guid.Parse(principal.Claims.Where(c => c.Type == JwtRegisteredClaimNames.Sub).FirstOrDefault()?.Value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetFile");
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                await context.Response.StartAsync();
+                return;
+            }
+
+            ResizeParams resizeParams = new ResizeParams { hasParams = false };
+
             // hand to next middleware if we are not dealing with an image
-            if (context.Request.Query.Count == 0 || !IsImagePath(path))
+            var isImage = IsImagePath(path);            
+            if (isImage)
             {
-                await _req.Invoke(context);
-                return;
+                resizeParams = GetResizeParams(path, context.Request.Query);
             }
-
-            // hand to next middleware if we are dealing with an image but it doesn't have any usable resize querystring params
-            var resizeParams = GetResizeParams(path, context.Request.Query);
-            if (!resizeParams.hasParams)
-            {
-                await _req.Invoke(context);
-                return;
-            }
-            //var imageResizerJsonPath = Path.Combine(_env.ContentRootPath, "ImageResizerJson.json");
-
+            
             // if we got this far, resize it
             _logger.LogInformation($"Resizing {path.Value} with params {resizeParams}");
 
             // get the image location on disk
 
-            string imagePath = string.Empty;
+            string filePath = string.Empty;
             if (path.ToString().ToLower().Contains("/upload/") && (miscOptions.Value.UseFileShare))
             {
-	            imagePath = Path.Combine(
+	            filePath = Path.Combine(
 		            miscOptions.Value.FileShareLocation,
 		            path.Value.Replace('/', Path.DirectorySeparatorChar)
 			            .TrimStart(Path.DirectorySeparatorChar))
@@ -69,30 +106,42 @@ namespace ImageResizer.AspNetCore
             }
             else
             {
-	            imagePath = Path.Combine(
+	            filePath = Path.Combine(
 		            _env.ContentRootPath,
 		            path.Value.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar));
             }
 
             // check file lastwrite
-            var lastWriteTimeUtc = File.GetLastWriteTimeUtc(imagePath);
+            var lastWriteTimeUtc = File.GetLastWriteTimeUtc(filePath);
             if (lastWriteTimeUtc.Year == 1601) // file doesn't exist, pass to next middleware
             {
                 await _req.Invoke(context);
                 return;
             }
 
-            var imageData = GetImageData(imagePath, resizeParams, lastWriteTimeUtc);
+            if (isImage)
+            {
+                var imageData = GetImageData(filePath, resizeParams, lastWriteTimeUtc);
 
-            // write to stream
-            context.Response.ContentType = resizeParams.format == "png" ? "image/png" : "image/jpeg";
-            context.Response.ContentLength = imageData.Size;
-            await context.Response.Body.WriteAsync(imageData.ToArray(), 0, (int)imageData.Size);
+                // write to stream
+                context.Response.ContentType = resizeParams.format == "png" ? "image/png" : "image/jpeg";
+                context.Response.ContentLength = imageData.Size;
+                await context.Response.Body.WriteAsync(imageData.ToArray(), 0, (int)imageData.Size);
 
-            // cleanup
-            imageData.Dispose();
+                // cleanup
+                imageData.Dispose();
+            }
+            else
+            {
+                var bytes = System.IO.File.ReadAllBytes(filePath);
 
+                string mimeType = MimeTypesMap.GetMimeType(filePath);
+                context.Response.ContentType = mimeType;
+                context.Response.ContentLength = bytes.Length;
+                await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+            }
         }
+
         private SKData GetImageData(string imagePath, ResizeParams resizeParams, DateTime lastWriteTimeUtc)
         {
             // check cache and return if cached
@@ -215,6 +264,18 @@ namespace ImageResizer.AspNetCore
                 return false;
 
             return suffixes.Any(x => x.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private string GetToken(IQueryCollection query)
+        {
+            if (query.ContainsKey("t"))
+            {
+                return query["t"];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private ResizeParams GetResizeParams(PathString path, IQueryCollection query)

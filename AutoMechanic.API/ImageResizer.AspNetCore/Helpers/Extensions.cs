@@ -16,6 +16,11 @@ namespace ImageResizer.AspNetCore.Helpers
             return builder.UseMiddleware<ImageResizerMiddleware>();
         }
 
+        public static IApplicationBuilder UseUploadFolderAccess(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<UploadFolderAccessMiddleware>();
+        }
+
         internal static SKTextAlign GetSKTextAlign(this short align)
         {
             switch (align)
