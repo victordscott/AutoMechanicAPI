@@ -13,6 +13,12 @@ public partial class FileUpload
 
     public string FileName { get; set; } = null!;
 
+    public string UrlDomain { get; set; } = null!;
+
+    public string UrlPath { get; set; } = null!;
+
+    public string OriginalFileName { get; set; } = null!;
+
     public string? FileNote { get; set; }
 
     public int FileSizeBytes { get; set; }

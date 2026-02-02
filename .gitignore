@@ -430,3 +430,4 @@ FodyWeavers.xsd
 # Custom
 
 AutoMechanic.API/FFmpeg/
+AutoMechanic.API/Upload/

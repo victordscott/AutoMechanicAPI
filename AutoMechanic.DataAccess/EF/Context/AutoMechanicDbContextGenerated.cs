@@ -482,7 +482,10 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.IsPublic)
                 .HasDefaultValue(false)
                 .HasColumnName("is_public");
+            entity.Property(e => e.OriginalFileName).HasColumnName("original_file_name");
             entity.Property(e => e.UploadedById).HasColumnName("uploaded_by_id");
+            entity.Property(e => e.UrlDomain).HasColumnName("url_domain");
+            entity.Property(e => e.UrlPath).HasColumnName("url_path");
             entity.Property(e => e.VideoLengthSec).HasColumnName("video_length_sec");
 
             entity.HasOne(d => d.FileType).WithMany(p => p.FileUploads)

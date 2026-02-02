@@ -43,7 +43,7 @@ namespace AutoMechanic.API.Controllers
             }
 
             var userId = AuthHelper.GetUserIdFromPrincipal(User);
-            var userFolder = "c" + userId.ToString().Replace("-", "").ToString();
+            var userFolder = userId.ToString().Replace("-", "").ToString();
             var fileDir = Path.Combine(Path.Combine(hostingEnvironment.ContentRootPath, "Upload"), userFolder);
 
             DirectoryInfo di = new DirectoryInfo(fileDir);

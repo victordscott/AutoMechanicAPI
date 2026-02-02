@@ -23,11 +23,16 @@ CREATE TABLE rating (
 );
 
 DROP TABLE IF EXISTS file_upload CASCADE;
+
+DROP TABLE IF EXISTS file_upload;
 CREATE TABLE file_upload (
 	file_upload_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     uploaded_by_id UUID NOT NULL,
     file_type_id SMALLINT NOT NULL,
     file_name TEXT NOT NULL,
+	url_domain TEXT NOT NULL,
+	url_path TEXT NOT NULL,
+	original_file_name TEXT NOT NULL,
     file_note TEXT NULL,
 	file_size_bytes INT NOT NULL,
 	video_length_sec INT NULL,
