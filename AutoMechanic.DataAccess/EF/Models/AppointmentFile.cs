@@ -19,6 +19,10 @@ public partial class AppointmentFile
 
     public DateTime DateUpdated { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public DateTime? DeletedDate { get; set; }
+
     public virtual Appointment Appointment { get; set; } = null!;
 
     public virtual FileUpload FileUpload { get; set; } = null!;

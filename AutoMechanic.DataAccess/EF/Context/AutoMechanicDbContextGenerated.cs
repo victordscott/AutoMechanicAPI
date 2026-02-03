@@ -150,7 +150,11 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.DateUpdated)
                 .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
                 .HasColumnName("date_updated");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
 
             entity.HasOne(d => d.Appointment).WithMany(p => p.AppointmentFiles)
                 .HasForeignKey(d => d.AppointmentId)
@@ -589,7 +593,11 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.DateUpdated)
                 .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
                 .HasColumnName("date_updated");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.FileUpload).WithMany(p => p.UserFiles)
@@ -706,7 +714,11 @@ public partial class AutoMechanicDbContextGenerated : DbContext
             entity.Property(e => e.DateUpdated)
                 .HasDefaultValueSql("(now() AT TIME ZONE 'utc'::text)")
                 .HasColumnName("date_updated");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.FileUploadId).HasColumnName("file_upload_id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
             entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
 
             entity.HasOne(d => d.FileUpload).WithMany(p => p.VehicleFiles)

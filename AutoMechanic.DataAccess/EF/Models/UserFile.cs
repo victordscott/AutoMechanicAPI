@@ -19,6 +19,10 @@ public partial class UserFile
 
     public DateTime DateUpdated { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public DateTime? DeletedDate { get; set; }
+
     public virtual FileUpload FileUpload { get; set; } = null!;
 
     public virtual AspNetUser User { get; set; } = null!;
