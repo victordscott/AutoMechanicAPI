@@ -146,6 +146,8 @@ CREATE TABLE vehicle_file (
     consultant_note TEXT NULL,
     date_created timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
     date_updated timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
+	is_deleted bool NOT NULL DEFAULT false,
+	deleted_date timestamptz NULL,	
     CONSTRAINT fk_vehicle_file_upload_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle(vehicle_id),
     CONSTRAINT fk_vehicle_file_upload_file FOREIGN KEY (file_upload_id) REFERENCES file_upload(file_upload_id)
 );
@@ -198,6 +200,8 @@ CREATE TABLE appointment_file (
     consultant_note TEXT NULL,
     date_created timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
     date_updated timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
+	is_deleted bool NOT NULL DEFAULT false,
+	deleted_date timestamptz NULL,	
     CONSTRAINT fk_appt_file_upload_appt FOREIGN KEY (appointment_id) REFERENCES appointment(appointment_id),
     CONSTRAINT fk_appt_file_upload_file FOREIGN KEY (file_upload_id) REFERENCES file_upload(file_upload_id)
 );
@@ -225,6 +229,8 @@ CREATE TABLE user_file (
     consultant_note TEXT NULL,
     date_created timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
     date_updated timestamptz NOT NULL DEFAULT (now() at time zone 'utc'),
+	is_deleted bool NOT NULL DEFAULT false,
+	deleted_date timestamptz NULL,	
     CONSTRAINT fk_user_file_upload_user FOREIGN KEY (user_id) REFERENCES "AspNetUsers"("Id"),
     CONSTRAINT fk_user_file_upload_file FOREIGN KEY (file_upload_id) REFERENCES file_upload(file_upload_id)
 );

@@ -7,7 +7,7 @@ namespace AutoMechanic.DataAccess.Repositories.Interfaces
 {
     public interface IVehicleRepository
     {
-        Task<Guid> AddVehicleAsync(VehicleDTO vehicleDto);
+        Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
     }
 }

@@ -17,9 +17,9 @@ namespace AutoMechanic.DataAccess.Repositories
         IMapper mapper
     ) : IVehicleRepository
     {
-        public async Task<Guid> AddVehicleAsync(VehicleDTO vehicleDto)
+        public async Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO)
         {
-            var vehicle = mapper.Map<Vehicle>(vehicleDto);
+            var vehicle = mapper.Map<Vehicle>(vehicleDTO);
 
             if (vehicle.VehicleId == Guid.Empty)
                 vehicle.VehicleId = Guid.NewGuid();
@@ -46,6 +46,11 @@ namespace AutoMechanic.DataAccess.Repositories
                     .ToListAsync();
                 return mapper.Map<List<VehicleDTO>>(vehicles);
             }
+        }
+
+        public async Task<bool> AddFileUploadToVehichleAsync()
+        {
+            return true;
         }
     }
 }

@@ -34,8 +34,10 @@ namespace AutoMechanic.DataAccess.MappingProfiles
             CreateMap<ConsultantAvailabilityDateDTO, ConsultantAvailabilityDate>()
                 .ForMember(x => x.ConsultantAvailabilityDateId, expression => expression.Ignore());
             CreateMap<EF.Models.SupportedTimeZone, TimeZoneDTO>();
-            CreateMap<VehicleDTO, Vehicle>();
-            CreateMap<Vehicle, VehicleDTO>();
+            CreateMap<VehicleDTO, Vehicle>()
+                .ReverseMap();
+            CreateMap<FileUpload, FileUploadDTO>()
+                .ReverseMap();
         }
     }
 }
