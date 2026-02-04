@@ -1,4 +1,5 @@
 using AutoMechanic.DataAccess.DTO;
+using AutoMechanic.DataAccess.Models.Proc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,5 +10,6 @@ namespace AutoMechanic.DataAccess.Repositories.Interfaces
     {
         Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
+        Task<VehicleWithFiles> GetVehicleWithFiles(Guid vehicleId);
     }
 }

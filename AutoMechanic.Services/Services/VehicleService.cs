@@ -1,4 +1,5 @@
 using AutoMechanic.DataAccess.DTO;
+using AutoMechanic.DataAccess.Models.Proc;
 using AutoMechanic.DataAccess.Repositories.Interfaces;
 using AutoMechanic.Services.Services.Interfaces;
 using System;
@@ -16,6 +17,11 @@ namespace AutoMechanic.Services.Services
         public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)
         {
             return await vehicleRepository.GetVehiclesByCustomerIdAsync(customerId);
+        }
+
+        public async Task<VehicleWithFiles> GetVehicleWithFilesAsync(Guid vehicleId)
+        {
+            return await vehicleRepository.GetVehicleWithFiles(vehicleId);
         }
     }
 }

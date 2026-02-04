@@ -51,7 +51,7 @@ public class ProcCaller : IProcCaller
         int result = 0;
         using (NpgsqlConnection sqlConnection = new NpgsqlConnection(connection) { })
         {
-            sqlConnection.Open();
+            await sqlConnection.OpenAsync();
             var fullSql = $"SELECT {sql}()";
             if (param != null)
             {
@@ -167,7 +167,7 @@ public class ProcCaller : IProcCaller
     //    }
     //}
 
-    public T CallProc<T>(
+    public async Task<T> CallProc<T>(
         string procName,
         object param = null,
         string connection = null
@@ -214,9 +214,9 @@ public class ProcCaller : IProcCaller
                     }
                     cmd.Parameters.AddWithValue("param", paramType, param);
                 }
-                using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         if (!reader.IsDBNull(0))
                         {

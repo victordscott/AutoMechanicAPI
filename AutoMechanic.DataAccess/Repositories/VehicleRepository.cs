@@ -1,7 +1,9 @@
 using AutoMapper;
+using AutoMechanic.DataAccess.DirectAccess;
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Context;
 using AutoMechanic.DataAccess.EF.Models;
+using AutoMechanic.DataAccess.Models.Proc;
 using AutoMechanic.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,6 +16,7 @@ namespace AutoMechanic.DataAccess.Repositories
 {
     public class VehicleRepository(
         IDbContextFactory<AutoMechanicDbContext> dbContextFactory,
+        IProcCaller procCaller,
         IMapper mapper
     ) : IVehicleRepository
     {
@@ -66,6 +69,11 @@ namespace AutoMechanic.DataAccess.Repositories
             }
 
             return vehicleFileDTO;
+        }
+
+        public async Task<VehicleWithFiles> GetVehicleWithFiles(Guid vehicleId)
+        {
+            return await procCaller.CallProc<VehicleWithFiles>("get_vehicle_with_files", vehicleId);
         }
     }
 }

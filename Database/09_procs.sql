@@ -38,7 +38,7 @@ BEGIN
 END $$;
 
 CREATE OR REPLACE FUNCTION get_vehicle_with_files(p_vehicle_id uuid)
-RETURNS JSONB LANGUAGE 
+RETURNS JSON LANGUAGE 
 sql AS
 -- variable declaration requires plpgsql and return statement
 -- BEGIN and END do not work with sql (only plpsql)
@@ -46,9 +46,8 @@ sql AS
 $$
 --BEGIN
 	--return (
-	SELECT jsonb_agg
-	(
-		jsonb_build_object(
+	SELECT 
+		json_build_object(
 			'vehicle_id', a.vehicle_id,
 			'customer_id', a.customer_id,
 			'vehicle_vin', a.vehicle_vin,
@@ -64,12 +63,13 @@ $$
 			'files', COALESCE
 			(
 				(
-					SELECT jsonb_agg 
+					SELECT json_agg 
 					(
-						jsonb_build_object 
+						json_build_object 
 						(
 							'vehicle_file_id', b.vehicle_file_id,
 							'file_upload_id', b.file_upload_id,
+							'file_type_name', d.file_type_name,
 							'customer_note', b.customer_note,
 							'consultant_note', b.customer_note,
 							'date_created', b.date_created,
@@ -86,13 +86,13 @@ $$
 						)
 					)
 					FROM vehicle_file b inner join file_upload c on b.file_upload_id = c.file_upload_id
+					inner join file_type d on c.file_type_id = d.file_type_id
 					WHERE b.vehicle_id = a.vehicle_id
 					and b.is_deleted = false 
 					and c.is_deleted = false
-				), '[]'::jsonb
+				), '[]'::json
 			)
 		)
-	)
 	FROM vehicle a
 	where vehicle_id = p_vehicle_id;
 	--);
