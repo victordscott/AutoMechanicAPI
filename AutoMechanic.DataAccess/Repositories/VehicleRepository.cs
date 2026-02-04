@@ -48,9 +48,24 @@ namespace AutoMechanic.DataAccess.Repositories
             }
         }
 
-        public async Task<bool> AddFileUploadToVehichleAsync()
+        public async Task<VehicleFileDTO> AddFileUploadToVehicleAsync(VehicleFileDTO vehicleFileDTO)
         {
-            return true;
+            var vehicleFile = mapper.Map<VehicleFile>(vehicleFileDTO);
+
+            if (vehicleFile.VehicleId == Guid.Empty)
+                vehicleFile.VehicleId = Guid.NewGuid();
+
+            var now = DateTime.UtcNow;
+            vehicleFile.DateCreated = now;
+            vehicleFile.DateUpdated = now;
+
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                await dbContext.VehicleFiles.AddAsync(vehicleFile);
+                await dbContext.SaveChangesAsync();
+            }
+
+            return vehicleFileDTO;
         }
     }
 }

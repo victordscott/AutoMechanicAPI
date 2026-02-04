@@ -49,7 +49,8 @@ public static class DependencyLoader
         builder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
         builder.RegisterType<ConsultantRepository>().As<IConsultantRepository>().SingleInstance();
         builder.RegisterType<VehicleRepository>().As<IVehicleRepository>().SingleInstance();
-        
+        builder.RegisterType<FileUploadRepository>().As<IFileUploadRepository>().SingleInstance();
+
         return services;
     }
 }

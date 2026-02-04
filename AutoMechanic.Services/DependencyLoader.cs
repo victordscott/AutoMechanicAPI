@@ -21,6 +21,7 @@ namespace AutoMechanic.Services
             builder.RegisterType<UserService>().As<IUserService>().SingleInstance();
             builder.RegisterType<ConsultantService>().As<IConsultantService>().SingleInstance();
             builder.RegisterType<VehicleService>().As<IVehicleService>().SingleInstance();
+            builder.RegisterType<FileUploadService>().As<IFileUploadService>().SingleInstance();
 
             return services;
         }

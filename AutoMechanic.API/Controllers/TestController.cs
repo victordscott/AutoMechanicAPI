@@ -128,6 +128,14 @@ namespace AutoMechanic.API.Controllers
             return data;
         }
 
+        [HttpGet]
+        public ContentResult TestGetVehiclesWithFiles()
+        {
+            var jsonString = procCaller.CallProc<string>("get_vehicle_with_files", Guid.Parse("3e345111-a8ab-4d8e-b339-76fd09e124d7"));
+
+            return Content(jsonString, "application/json");
+        }
+
         [Authorize(Roles = "Administrator")]
         [HttpGet]
         public dynamic TestAdmin()

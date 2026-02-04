@@ -4,6 +4,8 @@ using AutoMechanic.Auth.Models;
 using AutoMechanic.Auth.Services;
 using AutoMechanic.Auth.Services.Interfaces;
 using AutoMechanic.Configuration.Options;
+using AutoMechanic.DataAccess.DTO;
+using AutoMechanic.Services.Services.Interfaces;
 using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +27,7 @@ namespace AutoMechanic.API.Controllers
     [Route("[controller]/[action]")]
     [ApiController]
     public class FileController(
+        IFileUploadService fileUploadService,
         IHostingEnvironment hostingEnvironment,
         IOptions<MiscOptions> miscOptions,
         ITokenService tokenService,
@@ -99,7 +102,7 @@ namespace AutoMechanic.API.Controllers
 
                         if (mediaType == FileExtensionHelper.MediaType.Image)
                         {
-                            data = await SaveImage(section.Body, originalFileName, fileDir, userFolder, mediaType);
+                            data = await SaveImage(section.Body, userId, originalFileName, fileDir, userFolder, mediaType);
                         }
 
                         results.Add(data);
@@ -452,14 +455,15 @@ namespace AutoMechanic.API.Controllers
 
         private async Task<dynamic> SaveImage(
             Stream stream,
+            Guid userId,
             string originalFileName,
             string uploadDir,
             string userFolder,
             FileExtensionHelper.MediaType mediaType)
         {
             string ext = System.IO.Path.GetExtension(originalFileName);
-            string fileId = Guid.NewGuid().ToString();
-            string fileName = fileId + ext;
+            Guid fileUploadId = Guid.NewGuid();
+            string fileName = fileUploadId + ext;
             long fileSize = 0;
 
             using (FileStream fileStream = System.IO.File.Create(Path.Combine(uploadDir, fileName)))
@@ -475,23 +479,38 @@ namespace AutoMechanic.API.Controllers
                 originalFileName = nameWithoutExt.Substring(0, 100 - ext.Length) + ext;
             }
 
-            var data = new
+            var fileUploadDTO = new FileUploadDTO
             {
-                FileId = fileId,
-                //Url = string.Format("{0}://{1}/Upload/{2}/{3}", Request.RequestUri.Scheme, Request.RequestUri.Authority, customerFolder, fileName),
+                FileUploadId = fileUploadId,
+                UploadedById = userId,
+                FileTypeId = 1, //TODO - check enum
+                FileName = fileName,
                 UrlDomain = string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host),
                 UrlPath = string.Format("/Upload/{0}/{1}", userFolder, fileName),
-                FileName = fileName,
                 OriginalFileName = originalFileName,
-                MediaType = mediaType.ToString(),
-                MediaTypeId = (int)mediaType,
-                Description = "",
-                Uploaded = true,
-                UploadDateUtc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"),
-                IsDeleted = false
+                FileSizeBytes = (int)fileSize, //TODO
+                IsPublic = false
             };
 
-            return data;
+            var fileUpload = await fileUploadService.InsertFileUploadAsync(fileUploadDTO);
+
+            //var data = new
+            //{
+            //    FileId = fileUploadId,
+            //    //Url = string.Format("{0}://{1}/Upload/{2}/{3}", Request.RequestUri.Scheme, Request.RequestUri.Authority, customerFolder, fileName),
+            //    UrlDomain = string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host),
+            //    UrlPath = string.Format("/Upload/{0}/{1}", userFolder, fileName),
+            //    FileName = fileName,
+            //    OriginalFileName = originalFileName,
+            //    MediaType = mediaType.ToString(),
+            //    MediaTypeId = (int)mediaType,
+            //    Description = "",
+            //    Uploaded = true,
+            //    UploadDateUtc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss"),
+            //    IsDeleted = false
+            //};
+
+            return fileUpload;
         }
 
         private static Encoding GetEncoding(MultipartSection section)

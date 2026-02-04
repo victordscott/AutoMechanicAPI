@@ -2,6 +2,7 @@
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Context;
 using AutoMechanic.DataAccess.EF.Models;
+using AutoMechanic.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
@@ -16,7 +17,7 @@ namespace AutoMechanic.DataAccess.Repositories
     public class FileUploadRepository(
         IDbContextFactory<AutoMechanicDbContext> dbContextFactory,
         IMapper mapper
-    )
+    ) : IFileUploadRepository
     {
         public async Task<FileUploadDTO> InsertFileUploadAsync(FileUploadDTO fileUploadDTO)
         {
@@ -35,9 +36,5 @@ namespace AutoMechanic.DataAccess.Repositories
             }
             return mapper.Map<FileUploadDTO>(fileUpload);
         }
-
-
-
-
     }
 }

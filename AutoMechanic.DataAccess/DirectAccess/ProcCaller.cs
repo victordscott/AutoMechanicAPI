@@ -10,7 +10,9 @@ using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace AutoMechanic.DataAccess.DirectAccess;
@@ -252,9 +254,10 @@ public class ProcCaller : IProcCaller
         var convertedJson = postgreJson;
         if (!string.IsNullOrEmpty(convertedJson))
         {
-            //convertedJson = convertedJson.Replace("\\\"", "");
-            //convertedJson = convertedJson.Replace("\\u0027", "'");
-            //convertedJson = convertedJson.Replace("\\u0022", "\"");
+            // experiment didn't work, may not work with dynamic types?
+            //var x = System.Text.Json.JsonSerializer.Deserialize<List<ExpandoObject>>(convertedJson);
+            //convertedJson = System.Text.Json.JsonSerializer.Serialize(x, x.GetType(), new JsonSerializerOptions { PropertyNamingPolicy = new PascalCaseNamingPolicy() } );
+
             var settings = new JsonSerializerSettings { ContractResolver = new PascalCaseContractResolver() };
             if (convertedJson.StartsWith("{"))
             {

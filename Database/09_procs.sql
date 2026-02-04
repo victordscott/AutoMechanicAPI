@@ -37,6 +37,68 @@ BEGIN
 	end if;
 END $$;
 
+CREATE OR REPLACE FUNCTION get_vehicle_with_files(p_vehicle_id uuid)
+RETURNS JSONB LANGUAGE 
+sql AS
+-- variable declaration requires plpgsql and return statement
+-- BEGIN and END do not work with sql (only plpsql)
+--plpgsql AS
+$$
+--BEGIN
+	--return (
+	SELECT jsonb_agg
+	(
+		jsonb_build_object(
+			'vehicle_id', a.vehicle_id,
+			'customer_id', a.customer_id,
+			'vehicle_vin', a.vehicle_vin,
+			'vehicle_year', a.vehicle_year,
+			'vehicle_make', a.vehicle_make,
+			'vehicle_model', a.vehicle_model,
+			'vin_lookup_result', a.vin_lookup_result,
+			'current_mileage', a.current_mileage,			   
+			'customer_note', a.customer_note,
+			'consultant_note', a.consultant_note,
+			'date_created', a.date_created,
+			'date_updated', a.date_updated,
+			'files', COALESCE
+			(
+				(
+					SELECT jsonb_agg 
+					(
+						jsonb_build_object 
+						(
+							'vehicle_file_id', b.vehicle_file_id,
+							'file_upload_id', b.file_upload_id,
+							'customer_note', b.customer_note,
+							'consultant_note', b.customer_note,
+							'date_created', b.date_created,
+							'date_updated', a.date_updated,
+							'file_type_id', c.file_type_id,
+							'file_name', c.file_name,
+							'url_domain', c.url_domain,
+							'url_path', c.url_path,
+							'original_file_name', c.original_file_name,
+							'file_note', c.file_note,
+							'file_size_bytes', c.file_size_bytes,
+							'is_public', c.is_public,
+							'upload_date_created', c.date_created
+						)
+					)
+					FROM vehicle_file b inner join file_upload c on b.file_upload_id = c.file_upload_id
+					WHERE b.vehicle_id = a.vehicle_id
+					and b.is_deleted = false 
+					and c.is_deleted = false
+				), '[]'::jsonb
+			)
+		)
+	)
+	FROM vehicle a
+	where vehicle_id = p_vehicle_id;
+	--);
+--END 
+$$;
+
 
 
 
