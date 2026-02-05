@@ -41,6 +41,16 @@ builder.Services.RegisterIdentityDependencies();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Services.LoadOptions(builder.Configuration);
 
+// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/options?view=aspnetcore-10.0
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    // Defaults to 30,000,000 bytes
+    serverOptions.Limits.MaxRequestBodySize = 300_000_000;
+    // RequestHeadersTimeout gets or sets the maximum amount of time the server spends receiving request headers:
+    // Defaults to 30 seconds.
+    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(2);
+});
+
 var connectionString = builder.Configuration.GetValue<string>("Database:ConnectionString");
 
 builder.Host.UseSerilog((context, services, configuration) =>

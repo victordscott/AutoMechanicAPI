@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Models;
+using AutoMechanic.DataAccess.Models.Proc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,8 @@ namespace AutoMechanic.DataAccess.MappingProfiles
                 .ReverseMap();
             CreateMap<FileUpload, FileUploadDTO>()
                 .ReverseMap();
+
+            CreateMap<VehicleWithFiles, Vehicle>();
         }
     }
 }

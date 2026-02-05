@@ -1,4 +1,6 @@
-﻿namespace AutoMechanic.Api.Helpers
+﻿using AutoMechanic.Common.Enums;
+
+namespace AutoMechanic.Api.Helpers
 {
     public class FileExtensionHelper
     {
@@ -55,6 +57,30 @@
             Other = 5,
             ZipFile = 6,
             CSV = 7
+        }
+
+        public static FileTypeEnum? GetFileType(string fileExtension)
+        {
+            if (ImageFileExtensions.Contains(fileExtension))
+            {
+                return FileTypeEnum.Image;
+            }
+            else if (VideoFileExtensions.Contains(fileExtension))
+            {
+                return FileTypeEnum.Video;
+            }
+            else if (fileExtension.Equals(".pdf"))
+            {
+                return FileTypeEnum.PDF;
+            }
+            else if (fileExtension.Equals(".txt"))
+            {
+                return FileTypeEnum.Text;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static MediaType GetMediaType(string fileExtension)

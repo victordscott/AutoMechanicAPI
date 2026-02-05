@@ -40,6 +40,40 @@ namespace AutoMechanic.DataAccess.Repositories
             return vehicle.VehicleId;
         }
 
+        public async Task<VehicleWithFiles> AddVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles)
+        {
+            var vehicle = mapper.Map<Vehicle>(vehicleWithFiles);
+
+            if (vehicle.VehicleId == Guid.Empty)
+                vehicle.VehicleId = Guid.NewGuid();
+
+            var now = DateTime.UtcNow;
+            vehicle.DateCreated = now;
+            vehicle.DateUpdated = now;
+
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                await dbContext.Vehicles.AddAsync(vehicle);
+                if (vehicleWithFiles.NewFiles != null && vehicleWithFiles.NewFiles.Count > 0)
+                {
+                    foreach (var file in vehicleWithFiles.NewFiles)
+                    {
+                        await dbContext.VehicleFiles.AddAsync(new VehicleFile
+                        {
+                            VehicleFileId = Guid.NewGuid(),
+                            VehicleId = vehicle.VehicleId,
+                            FileUploadId = file.FileUploadId,
+                            DateCreated = now,
+                            DateUpdated = now
+                        });
+                    }
+                }
+                await dbContext.SaveChangesAsync();
+            }
+
+            return await GetVehicleWithFiles(vehicle.VehicleId);
+        }
+
         public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)
         {
             using (var dbContext = dbContextFactory.CreateDbContext())

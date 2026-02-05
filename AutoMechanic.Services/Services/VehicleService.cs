@@ -9,9 +9,14 @@ namespace AutoMechanic.Services.Services
 {
     public class VehicleService(IVehicleRepository vehicleRepository) : IVehicleService
     {
-        public async Task<Guid> AddVehicleAsync(VehicleDTO vehicleDto)
+        public async Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO)
         {
-            return await vehicleRepository.AddVehicleAsync(vehicleDto);
+            return await vehicleRepository.AddVehicleAsync(vehicleDTO);
+        }
+
+        public async Task<VehicleWithFiles> AddVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles)
+        {
+            return await vehicleRepository.AddVehicleWithFilesAsync(vehicleWithFiles);
         }
 
         public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)

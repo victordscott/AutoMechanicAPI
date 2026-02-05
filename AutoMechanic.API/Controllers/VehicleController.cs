@@ -1,5 +1,6 @@
 using AutoMechanic.Auth.Helpers;
 using AutoMechanic.DataAccess.DTO;
+using AutoMechanic.DataAccess.EF.Models;
 using AutoMechanic.DataAccess.Models.Proc;
 using AutoMechanic.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,17 @@ namespace AutoMechanic.API.Controllers
             var vehicleId = await vehicleService.AddVehicleAsync(vehicleDto);
             return StatusCode(StatusCodes.Status200OK, vehicleId);
         }
-        
+
+        [Authorize(Roles = "Customer")]
+        [HttpPost]
+        public async Task<ActionResult<Guid>> AddVehicleWithFiles([FromBody] VehicleWithFiles vehicleWithFiles)
+        {
+            var userId = AuthHelper.GetUserIdFromPrincipal(User);
+            vehicleWithFiles.CustomerId = userId;
+            var vehicleWithFilesNew = await vehicleService.AddVehicleWithFilesAsync(vehicleWithFiles);
+            return StatusCode(StatusCodes.Status200OK, vehicleWithFilesNew.VehicleId);
+        }
+
         [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VehicleDTO>>> GetVehiclesByCustomerId()

@@ -281,7 +281,7 @@ namespace ImageResizer.AspNetCore
             if (path == null || !path.HasValue)
                 return false;
 
-            return suffixes.Any(x => x.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+            return suffixes.Any(x => path.Value.EndsWith(x, StringComparison.OrdinalIgnoreCase));
         }
 
         private string GetToken(IQueryCollection query)

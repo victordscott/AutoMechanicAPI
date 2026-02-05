@@ -60,7 +60,7 @@ $$
 			'consultant_note', a.consultant_note,
 			'date_created', a.date_created,
 			'date_updated', a.date_updated,
-			'files', COALESCE
+			'current_files', COALESCE
 			(
 				(
 					SELECT json_agg 
@@ -83,7 +83,7 @@ $$
 							'file_size_bytes', c.file_size_bytes,
 							'is_public', c.is_public,
 							'upload_date_created', c.date_created
-						)
+						) order by b.date_created desc
 					)
 					FROM vehicle_file b inner join file_upload c on b.file_upload_id = c.file_upload_id
 					inner join file_type d on c.file_type_id = d.file_type_id

@@ -8,7 +8,8 @@ namespace AutoMechanic.Services.Services.Interfaces
 {
     public interface IVehicleService
     {
-        Task<Guid> AddVehicleAsync(VehicleDTO vehicleDto);
+        Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO);
+        Task<VehicleWithFiles> AddVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
         Task<VehicleWithFiles> GetVehicleWithFilesAsync(Guid vehicleId);
     }

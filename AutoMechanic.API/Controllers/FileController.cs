@@ -3,6 +3,7 @@ using AutoMechanic.Auth.Helpers;
 using AutoMechanic.Auth.Models;
 using AutoMechanic.Auth.Services;
 using AutoMechanic.Auth.Services.Interfaces;
+using AutoMechanic.Common.Enums;
 using AutoMechanic.Configuration.Options;
 using AutoMechanic.DataAccess.DTO;
 using AutoMechanic.Services.Services.Interfaces;
@@ -38,7 +39,10 @@ namespace AutoMechanic.API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<dynamic> StreamUpload()
+        //[DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = 300_000_000)]    // default is 128 MB (134,217,728 bytes)
+        [RequestSizeLimit(300_000_000)]
+        public async Task<ActionResult<FileUploadDTO>> StreamUpload()
         {
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -60,7 +64,8 @@ namespace AutoMechanic.API.Controllers
             var formAccumulator = new KeyValueAccumulator();
             string uploadType = null;
 
-            var results = new List<dynamic>();
+            //var results = new List<dynamic>();
+            FileUploadDTO fileUpload = null;
 
             // https://stackoverflow.com/a/56342020/2030207
             // attempt to fix error: System.IO.InvalidDataException: Multipart body length limit 16384 exceeded
@@ -97,15 +102,17 @@ namespace AutoMechanic.API.Controllers
                     {
                         string originalFileName = contentDisposition.FileName.Value;
                         string fileExtension = System.IO.Path.GetExtension(originalFileName).ToLower();
-                        FileExtensionHelper.MediaType mediaType = FileExtensionHelper.GetMediaType(fileExtension);
-                        dynamic data = null;
+                        //FileExtensionHelper.MediaType mediaType = FileExtensionHelper.GetMediaType(fileExtension);
 
-                        if (mediaType == FileExtensionHelper.MediaType.Image)
+                        var fileType = FileExtensionHelper.GetFileType(fileExtension);
+
+                        //dynamic data = null;
+                        if (fileType != null)
                         {
-                            data = await SaveImage(section.Body, userId, originalFileName, fileDir, userFolder, mediaType);
+                            fileUpload = await SaveFile(section.Body, userId, originalFileName, fileDir, userFolder, fileType.Value);
                         }
 
-                        results.Add(data);
+                        //results.Add(data);
                     }
                     else if (MultipartRequestHelper.HasFormDataContentDisposition(contentDisposition))
                     {
@@ -150,7 +157,15 @@ namespace AutoMechanic.API.Controllers
                 section = await reader.ReadNextSectionAsync();
             }
 
-            return base.Content(JsonSerializer.Serialize(results), "application/json", Encoding.UTF8);
+            //return base.Content(JsonSerializer.Serialize(results), "application/json", Encoding.UTF8);
+            if (fileUpload != null)
+            {
+                return fileUpload;
+            }
+            else
+            {
+                return new BadRequestResult();
+            }   
         }
 
         [Authorize]
@@ -453,13 +468,13 @@ namespace AutoMechanic.API.Controllers
             return base.Content(resultJson, "application/json", Encoding.UTF8);
         }
 
-        private async Task<dynamic> SaveImage(
+        private async Task<FileUploadDTO> SaveFile(
             Stream stream,
             Guid userId,
             string originalFileName,
             string uploadDir,
             string userFolder,
-            FileExtensionHelper.MediaType mediaType)
+            FileTypeEnum fileType)
         {
             string ext = System.IO.Path.GetExtension(originalFileName);
             Guid fileUploadId = Guid.NewGuid();
@@ -483,12 +498,12 @@ namespace AutoMechanic.API.Controllers
             {
                 FileUploadId = fileUploadId,
                 UploadedById = userId,
-                FileTypeId = 1, //TODO - check enum
+                FileTypeId = (short)fileType,
                 FileName = fileName,
                 UrlDomain = string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host),
                 UrlPath = string.Format("/Upload/{0}/{1}", userFolder, fileName),
                 OriginalFileName = originalFileName,
-                FileSizeBytes = (int)fileSize, //TODO
+                FileSizeBytes = (int)fileSize,
                 IsPublic = false
             };
 
