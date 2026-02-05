@@ -54,9 +54,9 @@ namespace AutoMechanic.DataAccess.Repositories
             using (var dbContext = dbContextFactory.CreateDbContext())
             {
                 await dbContext.Vehicles.AddAsync(vehicle);
-                if (vehicleWithFiles.NewFiles != null && vehicleWithFiles.NewFiles.Count > 0)
+                if (vehicleWithFiles.Files != null && vehicleWithFiles.Files.Count > 0)
                 {
-                    foreach (var file in vehicleWithFiles.NewFiles)
+                    foreach (var file in vehicleWithFiles.Files)
                     {
                         await dbContext.VehicleFiles.AddAsync(new VehicleFile
                         {
@@ -72,6 +72,67 @@ namespace AutoMechanic.DataAccess.Repositories
             }
 
             return await GetVehicleWithFiles(vehicle.VehicleId);
+        }
+
+        public async Task<VehicleWithFiles> UpdateVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles)
+        {
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                var vehicle = await dbContext.Vehicles.FindAsync(vehicleWithFiles.VehicleId);
+
+                if (vehicle != null)
+                {
+                    var mileageChanged = (vehicleWithFiles.CurrentMileage != vehicle.CurrentMileage);
+
+                    var now = DateTime.UtcNow;
+                    vehicle!.DateUpdated = now;
+                    vehicle.CustomerNote = vehicleWithFiles.CustomerNote;
+                    vehicle.CurrentMileage = vehicleWithFiles.CurrentMileage;
+
+                    if (vehicleWithFiles.Files != null && vehicleWithFiles.Files.Count > 0)
+                    {
+                        foreach (var file in vehicleWithFiles.Files)
+                        {
+                            if (file.FrontEndState == Common.Enums.FrontEndState.Updated)
+                            {
+                                await dbContext.VehicleFiles
+                                    .Where(f => f.VehicleFileId == file.EntityFileId)
+                                    .ExecuteUpdateAsync(u => u
+                                        .SetProperty(u => u.CustomerNote, file.CustomerNote)
+                                        .SetProperty(u => u.DateUpdated, now)
+                                );
+                            }
+                            else if (file.FrontEndState == Common.Enums.FrontEndState.Deleted)
+                            {
+                                await dbContext.VehicleFiles
+                                    .Where(f => f.VehicleFileId == file.EntityFileId)
+                                    .ExecuteUpdateAsync(u => u
+                                        .SetProperty(u => u.IsDeleted, true)
+                                        .SetProperty(u => u.DeletedDate, now)
+                                );
+                            }
+                            else if (file.FrontEndState == Common.Enums.FrontEndState.Added)
+                            {
+                                await dbContext.VehicleFiles.AddAsync(new VehicleFile
+                                {
+                                    VehicleFileId = Guid.NewGuid(),
+                                    VehicleId = vehicle.VehicleId,
+                                    FileUploadId = file.FileUploadId,
+                                    DateCreated = now,
+                                    DateUpdated = now
+                                });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Vehicle not found.");
+                }
+                await dbContext.SaveChangesAsync();
+            }
+
+            return await GetVehicleWithFiles(vehicleWithFiles.VehicleId);
         }
 
         public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)

@@ -17,4 +17,13 @@ namespace AutoMechanic.Common.Enums
         SetUserRoleError = 3,
         CreateCustomerError = 4
     }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum FrontEndState
+    {
+        NotModified = 1,
+        Added = 2,
+        Updated = 3,
+        Deleted = 4
+    }
 }

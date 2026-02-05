@@ -35,6 +35,16 @@ namespace AutoMechanic.API.Controllers
         }
 
         [Authorize(Roles = "Customer")]
+        [HttpPost]
+        public async Task<ActionResult<Guid>> UpdateVehicleWithFiles([FromBody] VehicleWithFiles vehicleWithFiles)
+        {
+            var userId = AuthHelper.GetUserIdFromPrincipal(User);
+            vehicleWithFiles.CustomerId = userId;
+            var vehicleWithFilesNew = await vehicleService.UpdateVehicleWithFilesAsync(vehicleWithFiles);
+            return StatusCode(StatusCodes.Status200OK, vehicleWithFilesNew.VehicleId);
+        }
+
+        [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VehicleDTO>>> GetVehiclesByCustomerId()
         {

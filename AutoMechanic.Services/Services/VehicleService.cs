@@ -19,6 +19,11 @@ namespace AutoMechanic.Services.Services
             return await vehicleRepository.AddVehicleWithFilesAsync(vehicleWithFiles);
         }
 
+        public async Task<VehicleWithFiles> UpdateVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles)
+        {
+            return await vehicleRepository.UpdateVehicleWithFilesAsync(vehicleWithFiles);
+        }
+
         public async Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId)
         {
             return await vehicleRepository.GetVehiclesByCustomerIdAsync(customerId);

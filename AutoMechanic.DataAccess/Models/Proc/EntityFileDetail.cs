@@ -1,10 +1,11 @@
+using AutoMechanic.Common.Enums;
 using System;
 
 namespace AutoMechanic.DataAccess.Models.Proc
 {
-    public class VehicleFileDetail
+    public class EntityFileDetail
     {
-        public Guid VehicleFileId { get; set; }
+        public Guid EntityFileId { get; set; }
 
         public Guid FileUploadId { get; set; }
 
@@ -35,5 +36,7 @@ namespace AutoMechanic.DataAccess.Models.Proc
         public bool IsPublic { get; set; }
 
         public DateTime UploadDateCreated { get; set; }
+
+        public FrontEndState FrontEndState { get; set; } = FrontEndState.NotModified;
     }
 }

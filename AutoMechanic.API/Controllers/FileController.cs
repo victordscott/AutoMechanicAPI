@@ -1,4 +1,5 @@
-﻿using AutoMechanic.Api.Helpers;
+﻿using AutoMapper;
+using AutoMechanic.Api.Helpers;
 using AutoMechanic.Auth.Helpers;
 using AutoMechanic.Auth.Models;
 using AutoMechanic.Auth.Services;
@@ -6,6 +7,7 @@ using AutoMechanic.Auth.Services.Interfaces;
 using AutoMechanic.Common.Enums;
 using AutoMechanic.Configuration.Options;
 using AutoMechanic.DataAccess.DTO;
+using AutoMechanic.DataAccess.Models.Proc;
 using AutoMechanic.Services.Services.Interfaces;
 using Hangfire.PostgreSql.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -32,7 +34,8 @@ namespace AutoMechanic.API.Controllers
         IHostingEnvironment hostingEnvironment,
         IOptions<MiscOptions> miscOptions,
         ITokenService tokenService,
-        ILogger<FileController> logger
+        ILogger<FileController> logger,
+        IMapper mapper
     ) : ControllerBase
     {
         private static readonly FormOptions defaultFormOptions = new FormOptions();
@@ -42,7 +45,7 @@ namespace AutoMechanic.API.Controllers
         //[DisableRequestSizeLimit]
         [RequestFormLimits(MultipartBodyLengthLimit = 300_000_000)]    // default is 128 MB (134,217,728 bytes)
         [RequestSizeLimit(300_000_000)]
-        public async Task<ActionResult<FileUploadDTO>> StreamUpload()
+        public async Task<ActionResult<EntityFileDetail>> StreamUpload()
         {
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -65,7 +68,7 @@ namespace AutoMechanic.API.Controllers
             string uploadType = null;
 
             //var results = new List<dynamic>();
-            FileUploadDTO fileUpload = null;
+            EntityFileDetail fileUpload = null;
 
             // https://stackoverflow.com/a/56342020/2030207
             // attempt to fix error: System.IO.InvalidDataException: Multipart body length limit 16384 exceeded
@@ -110,6 +113,7 @@ namespace AutoMechanic.API.Controllers
                         if (fileType != null)
                         {
                             fileUpload = await SaveFile(section.Body, userId, originalFileName, fileDir, userFolder, fileType.Value);
+                            fileUpload.FrontEndState = FrontEndState.Added;
                         }
 
                         //results.Add(data);
@@ -468,7 +472,7 @@ namespace AutoMechanic.API.Controllers
             return base.Content(resultJson, "application/json", Encoding.UTF8);
         }
 
-        private async Task<FileUploadDTO> SaveFile(
+        private async Task<EntityFileDetail> SaveFile(
             Stream stream,
             Guid userId,
             string originalFileName,
@@ -525,7 +529,7 @@ namespace AutoMechanic.API.Controllers
             //    IsDeleted = false
             //};
 
-            return fileUpload;
+            return mapper.Map<EntityFileDetail>(fileUpload);
         }
 
         private static Encoding GetEncoding(MultipartSection section)

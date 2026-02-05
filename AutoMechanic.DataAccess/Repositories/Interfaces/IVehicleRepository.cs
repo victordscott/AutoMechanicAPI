@@ -10,6 +10,7 @@ namespace AutoMechanic.DataAccess.Repositories.Interfaces
     {
         Task<Guid> AddVehicleAsync(VehicleDTO vehicleDTO);
         Task<VehicleWithFiles> AddVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles);
+        Task<VehicleWithFiles> UpdateVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
         Task<VehicleWithFiles> GetVehicleWithFiles(Guid vehicleId);
     }

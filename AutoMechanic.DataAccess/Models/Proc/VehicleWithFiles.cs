@@ -30,9 +30,6 @@ namespace AutoMechanic.DataAccess.Models.Proc
 
         public DateTime DateUpdated { get; set; }
 
-        public List<VehicleFileDetail> CurrentFiles { get; set; } = new();
-        public List<FileUploadDTO> NewFiles { get; set; } = new();
-        public List<VehicleFileDetail> DeletedFiles { get; set; } = new();
-        public List<VehicleFileDetail> ModifiedFiles { get; set; } = new();
+        public List<EntityFileDetail> Files { get; set; } = new();
     }
 }

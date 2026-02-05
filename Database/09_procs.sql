@@ -60,14 +60,14 @@ $$
 			'consultant_note', a.consultant_note,
 			'date_created', a.date_created,
 			'date_updated', a.date_updated,
-			'current_files', COALESCE
+			'files', COALESCE
 			(
 				(
 					SELECT json_agg 
 					(
 						json_build_object 
 						(
-							'vehicle_file_id', b.vehicle_file_id,
+							'entity_file_id', b.vehicle_file_id,
 							'file_upload_id', b.file_upload_id,
 							'file_type_name', d.file_type_name,
 							'customer_note', b.customer_note,

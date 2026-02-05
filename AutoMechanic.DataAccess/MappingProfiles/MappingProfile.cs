@@ -40,6 +40,9 @@ namespace AutoMechanic.DataAccess.MappingProfiles
             CreateMap<FileUpload, FileUploadDTO>()
                 .ReverseMap();
 
+            CreateMap<FileUploadDTO, EntityFileDetail>()
+                .ReverseMap();
+
             CreateMap<VehicleWithFiles, Vehicle>();
         }
     }
