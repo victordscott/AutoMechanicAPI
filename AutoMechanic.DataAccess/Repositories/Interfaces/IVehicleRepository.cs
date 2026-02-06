@@ -13,5 +13,6 @@ namespace AutoMechanic.DataAccess.Repositories.Interfaces
         Task<VehicleWithFiles> UpdateVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
         Task<VehicleWithFiles> GetVehicleWithFiles(Guid vehicleId);
+        Task<bool> DeleteVehicleAsync(Guid vehicleId);
     }
 }

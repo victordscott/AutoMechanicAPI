@@ -52,6 +52,12 @@ namespace AutoMechanic.API.Controllers
         }
 
         [HttpGet]
+        public IActionResult TestError()
+        {
+            throw new Exception("Test exception... *");
+        }
+
+        [HttpGet]
         public async Task<dynamic> TestLogin()
         {
             var password = "Vst!1971@";

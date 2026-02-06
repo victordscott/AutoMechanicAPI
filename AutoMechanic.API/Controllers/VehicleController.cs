@@ -62,5 +62,13 @@ namespace AutoMechanic.API.Controllers
                 return NotFound();
             return Ok(result);
         }
+
+        [Authorize(Roles = "Customer")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteVehicle([FromQuery] Guid vehicleId)
+        {
+            await vehicleService.DeleteVehicleAsync(vehicleId);
+            return Ok();
+        }
     }
 }

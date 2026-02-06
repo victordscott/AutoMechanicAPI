@@ -33,5 +33,10 @@ namespace AutoMechanic.Services.Services
         {
             return await vehicleRepository.GetVehicleWithFiles(vehicleId);
         }
+
+        public async Task<bool> DeleteVehicleAsync(Guid vehicleId)
+        {
+            return await vehicleRepository.DeleteVehicleAsync(vehicleId);
+        }
     }
 }

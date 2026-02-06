@@ -13,5 +13,6 @@ namespace AutoMechanic.Services.Services.Interfaces
         Task<VehicleWithFiles> UpdateVehicleWithFilesAsync(VehicleWithFiles vehicleWithFiles);
         Task<List<VehicleDTO>> GetVehiclesByCustomerIdAsync(Guid customerId);
         Task<VehicleWithFiles> GetVehicleWithFilesAsync(Guid vehicleId);
+        Task<bool> DeleteVehicleAsync(Guid vehicleId);
     }
 }

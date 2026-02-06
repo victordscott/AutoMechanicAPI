@@ -166,6 +166,20 @@ namespace AutoMechanic.DataAccess.Repositories
             return vehicleFileDTO;
         }
 
+        public async Task<bool> DeleteVehicleAsync(Guid vehicleId)
+        {
+            using (var dbContext = dbContextFactory.CreateDbContext())
+            {
+                await dbContext.Vehicles
+                    .Where(v => v.VehicleId == vehicleId)
+                    .ExecuteUpdateAsync(u => u
+                        .SetProperty(u => u.IsDeleted, true)
+                        .SetProperty(u => u.DeletedDate, DateTime.UtcNow)
+                    );
+            }
+            return true;
+        }
+
         public async Task<VehicleWithFiles> GetVehicleWithFiles(Guid vehicleId)
         {
             return await procCaller.CallProc<VehicleWithFiles>("get_vehicle_with_files", vehicleId);
